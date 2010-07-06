@@ -1,0 +1,14 @@
+## Ignore any bin executables, but track shell scripts
+bin/*
+!bin/*.*
+
+## Ignore the whole libs directory and anything in it
+lib/
+
+## Ignore the whole doxy directory and anything in it
+doxy/
+
+## Do not track any .o, .a, or .so files
+*.o
+*.a
+*.so
