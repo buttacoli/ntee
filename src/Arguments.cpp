@@ -1,7 +1,5 @@
 #include "Arguments.hpp"
 #include "Error.hpp"
-#include <algorithm>
-#include <functional>
 #include <string.h>
 #include <iostream>
 #include <iterator>
@@ -49,7 +47,8 @@ Settings Arguments::parse( int argc, char** argv )
    
    ErrIf( argc == 1 ).info(usage_);
    
-   int i = 1;   
+   int i = 1;
+   int last_arg_index = argc-1;
    std::string prog = argv[0];
    while ( i < argc ) {
       if ( ! strcmp(argv[i],"-h") || ! strcmp(argv[i],"--help") ) {
@@ -60,24 +59,26 @@ Settings Arguments::parse( int argc, char** argv )
          std::cerr << usage_ << "\n";
          std::exit(0);
       }
-      else if ( ! strcmp(argv[i],"-o") ) {
+      else if ( ! strcmp(argv[i],"-o") && i+1 <= last_arg_index ) {
          s.output_filename.assign(argv[++i]);
       }
-      else if ( ! strcmp(argv[i],"--sock") ) {
-         s.protocol = (!strcmp(argv[++i],"udp"))?Settings::UDP:Settings::TCP;
+      else if ( ! strcmp(argv[i],"--sock") && i+1 <= last_arg_index ) {
+         s.protocol = (!strcmp(argv[++i],"udp"))?Settings::UDP
+                                                :Settings::TCP;
       }
-      else if ( ! strcmp(argv[i],"-p") ) {
+      else if ( ! strcmp(argv[i],"-p") && i+1 <= last_arg_index ) {
          ErrIfCatch(boost::bad_lexical_cast,
                     s.srv_port=boost::lexical_cast<unsigned short>(argv[++i]))
                   .info("Bad port number specification\n");
       }
-      else if ( ! strcmp(argv[i],"-L") ) {
+      else if ( ! strcmp(argv[i],"-L") && i+2 <= last_arg_index ) {
          s.L_host_ip.assign(argv[++i]);
          ErrIfCatch(boost::bad_lexical_cast,
                     s.L_port=boost::lexical_cast<unsigned short>(argv[++i]))
                  .info("Bad L-port number\n");
       }
-      else if ( ! strcmp(argv[i],"-R") ) {
+      else if ( ! strcmp(argv[i],"-R") && i+1 <= last_arg_index ) {
+         ++i;  // skip the -R
          for( ; i<argc; ++i ) 
             s.R_cmd.push_back( argv[i] );
       }

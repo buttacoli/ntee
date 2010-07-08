@@ -73,9 +73,16 @@ int main(int argc, char** argv)
                      "                    that the process would connect would ordinarily be specified\n"
                      "                    with.  Ntee will also define the $NTEEPORT environment var\n"
                      "                    to the value which is being used for the ntee service port.\n"
+                     "                    NOTE: Because the argument parsing fills the array holding\n"
+                     "                          the command specified with any and all remaining args,\n"
+                     "                          the -R specification MUST BE THE LAST thing on the\n"
+                     "                          command line!  Other options the follow -R will be\n"
+                     "                          used in the starting of the R side client and not as\n"
+                     "                          settings for ntee.\n"
                      "\n"
                      "Notes:\n"
-                     "  Both the -l and -r arguments must be specified for ntee to start properly.\n"
+                     "  - Both the -L and -R arguments must be specified for ntee to start properly.\n"
+                     "  - The -R option must be the final option passed to ntee!\n"
                      "\n"
                );  /* end of HELP */
                    

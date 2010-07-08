@@ -15,6 +15,10 @@ NTEE_SOURCE := ntee_main.cpp \
                NTee.cpp \
                FileRecorder.cpp
                
+NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
+               
+               
+               
                
 .PHONY: all code doxy clean
 code: $(BIN)/ntee $(BIN)/testCli $(BIN)/testSrv
@@ -25,7 +29,11 @@ $(DOXYDIR)/index.html: $(BIN)/testCli $(BIN)/testSrv
 	-$(MKDIR) $(DOXYDIR)
 	(cd ..; $(DOXYGEN))
 
-$(BIN)/ntee: $(NTEE_SOURCE)
+$(LIB)/ntee.a: $(NTEE_OBJ)
+	-$(MKDIR) $(LIB)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
@@ -41,3 +49,21 @@ $(BIN)/testSrv: test_server.cpp Error.cpp Error.hpp Socket.hpp
 clean:
 	-rm $(BIN)/{testCli,testSrv}
 
+
+
+## Include all the .d files (fails the first time, but that's ok, make
+## just keeps on processing)... These are formatted to LOOK like dependency
+## targets specific to each cpp file.
+include $(patsubst %, .%, $(subst .cpp,.d,$(NTEE_SOURCE))) 
+
+
+## This is the rule for generating a .d from a .cpp.  It utilizes the fact
+## that gcc offers the option for pre-parsing code to generate makefile 
+## header dependency lists. Sed is used to filter the data, $* is the stem 
+## of the filename (file without the suffix). The $$$$ is just a pid. The
+## resulting target looks like "X.o X.d : X.cpp wha-wha-from-gcc"
+.%.d:%.cpp
+	$(CPP) -M $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+        
