@@ -30,18 +30,25 @@
 
 #include <iostream>
 #include <string>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include "Arguments.hpp"
+#include "Settings.hpp"
+#include "Builder.hpp"
+#include "FileRecorder.hpp"
+#include "NTee.hpp"
 
 int main(int argc, char** argv)
 {
    //! The @NTEEPORT string when seen in the arguments will be expanded to whatever
    //! port the kernel selected for the ntee server.
-   std::string USAGE("Usage: ntee [-h|--help] -o <path> --sock <tcp|udp> -p <N>\n"
+   std::string USAGE("Usage: ntee [-h|--help] [-o <path>] [--sock <tcp|udp>] [-p <N>]\n"
                      "             -L <host> <port> -R <cmd> [@NTEEPORT] [args...]\n");
    std::string HELP( "Purpose: NTEE is a program which sits between two other programs communicating\n"
                      "         through sockets.  As traffic comes between programs L and R, ntee\n"
                      "         records the timing and data being sent for further analysis or play-\n"
                      "         back.  The options in the command line usage reflect that there are\n"
-                     "         two programs, a left side process 'L', and right side process 'R')\n"
+                     "         two programs, a left side process 'L', and right side process 'R'\n"
                      "         with ntee sitting in the middle.\n"
                      "\n"
                      "   +---+                           +------+                         +---+\n"
@@ -50,7 +57,7 @@ int main(int argc, char** argv)
                      "\n"
                      "Flags:\n"
                      "  -o <path>         Path to where the output should be written.\n" 
-                     "                    Defaults to .\ntee_output\n"
+                     "                    Defaults to ./ntee_output\n"
                      "  --sock <tcp|udp>  Defines the socket type which the L and R side processes\n"
                      "                    are using.  Defaults to tcp.\n"
                      "  -p <int>          Forces the port number upon which ntee will serve to the\n"
@@ -73,12 +80,13 @@ int main(int argc, char** argv)
                );  /* end of HELP */
                    
    //** Collect the arguments
-   ntee::Arguments args(USAGE, HELP);
-   ntee::Settings s = args.parse( argc, argv );
+   using namespace ntee;
+   Arguments args(USAGE, HELP);
+   Settings s = args.parse( argc, argv );
    
    //** Based on the settings, build the right NTee type and add the FileRecorder
-   boost::scoped_ptr<ntee::NTee> pNT( ntee::Builder.build( s ) );
-   pNT->addRecorder( new FileRecorder(s) );
+   boost::scoped_ptr<NTee> pNT( Builder::build( s ) );
+   pNT->addRecorder( boost::shared_ptr<Recorder>(new FileRecorder(s) ));
    return pNT->start();
 }
    

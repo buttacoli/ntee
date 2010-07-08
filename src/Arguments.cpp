@@ -1,4 +1,12 @@
 #include "Arguments.hpp"
+#include "Error.hpp"
+#include <algorithm>
+#include <functional>
+#include <string.h>
+#include <iostream>
+#include <iterator>
+#include <boost/lexical_cast.hpp>
+
 
 namespace ntee {
 
@@ -39,8 +47,60 @@ Settings Arguments::parse( int argc, char** argv )
 {
    Settings s;
    
-   //! TODO: Parse the args
+   ErrIf( argc == 1 ).info(usage_);
    
+   int i = 1;   
+   std::string prog = argv[0];
+   while ( i < argc ) {
+      if ( ! strcmp(argv[i],"-h") || ! strcmp(argv[i],"--help") ) {
+         std::cerr << usage_ << "\n" << help_ << "\n";
+         std::exit(0);
+      }
+      else if ( ! strcmp(argv[i],"--usage") ) {
+         std::cerr << usage_ << "\n";
+         std::exit(0);
+      }
+      else if ( ! strcmp(argv[i],"-o") ) {
+         s.output_filename.assign(argv[++i]);
+      }
+      else if ( ! strcmp(argv[i],"--sock") ) {
+         s.protocol = (!strcmp(argv[++i],"udp"))?Settings::UDP:Settings::TCP;
+      }
+      else if ( ! strcmp(argv[i],"-p") ) {
+         ErrIfCatch(boost::bad_lexical_cast,
+                    s.srv_port=boost::lexical_cast<unsigned short>(argv[++i]))
+                  .info("Bad port number specification\n");
+      }
+      else if ( ! strcmp(argv[i],"-L") ) {
+         s.L_host_ip.assign(argv[++i]);
+         ErrIfCatch(boost::bad_lexical_cast,
+                    s.L_port=boost::lexical_cast<unsigned short>(argv[++i]))
+                 .info("Bad L-port number\n");
+      }
+      else if ( ! strcmp(argv[i],"-R") ) {
+         for( ; i<argc; ++i ) 
+            s.R_cmd.push_back( argv[i] );
+      }
+      else {
+         std::cerr << "bad argument : " << argv[i] << "\n";
+         std::exit(0);
+      }
+      ++i;
+   }
+   
+   //Print the structure
+   //!TODO - Remove printout
+   #define named_value( expr ) #expr << " = " << (expr) << "\n"
+   std::cout << named_value( s.protocol )
+             << named_value( s.srv_port )
+             << named_value( s.output_filename )
+             << named_value( s.L_host_ip )
+             << named_value( s.L_port )
+             << "s.R_cmd = [";
+   std::copy( s.R_cmd.begin(), s.R_cmd.end(), 
+              std::ostream_iterator<std::string>(std::cout,", "));
+   std::cout << "]\n";
+
    return s;
 }
 

@@ -26,10 +26,10 @@ struct Settings {
    enum proto { TCP, UDP };
    
    proto protocol;                     //!< protocol to use when connecting
-   unsigned int srv_port;              //!< port to start on (0 means wildcard!)
+   unsigned short srv_port;            //!< port to start on (0 means wildcard!)
    std::string output_filename;        //!< output file path name
    std::string L_host_ip;              //!< IP address of the L program
-   unsigned int L_port;                //!< Port at which L is listening
+   unsigned short L_port;              //!< Port at which L is listening
    std::vector<std::string> R_cmd;     //!< Command line args to start R with
 
    
@@ -44,6 +44,7 @@ struct Settings {
                 L_port(0)
    {  /* empty */ }
 };
+
 
 } /* end namespace ntee */
 
