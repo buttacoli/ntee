@@ -52,8 +52,8 @@
       A linux tee-like emulator for processes communicating through network socket IPC.
     </div>
 
-    <p>Usage: ntee [-h|--help] [-o <path>] [--sock <tcp|udp>] [-p <N>]
-             -L <host> <port> -R <cmd> [@NTEEPORT] [args...]
+    <p><pre>Usage: ntee [-h|--help] [-o &lt;path&gt;] [--sock &lt;tcp|udp&gt;] [-p &lt;N&gt;]
+             -L &lt;host&gt; &lt;port&gt; -R &lt;cmd&gt; [@NTEEPORT] [args...]
 
 Purpose: NTEE is a program which sits between two other programs communicating
          through sockets.  As traffic comes between programs L and R, ntee
@@ -63,22 +63,22 @@ Purpose: NTEE is a program which sits between two other programs communicating
          with ntee sitting in the middle.
 
    +---+                           +------+                         +---+
-   | L |---listen---><---connect---| ntee |----fork/exec----------->| R |
-   |___|                           |______|---listen--><--connect---|___|
+   | L |---listen---&gt;&lt;---connect---| ntee |----fork/exec-----------&gt;| R |
+   |___|                           |______|---listen--&gt;&lt;--connect---|___|
 
 Flags:
-  -o <path>         Path to where the output should be written.
+  -o &lt;path&gt;         Path to where the output should be written.
                     Defaults to ./ntee_output
-  --sock <tcp|udp>  Defines the socket type which the L and R side processes
+  --sock &lt;tcp|udp&gt;  Defines the socket type which the L and R side processes
                     are using.  Defaults to tcp.
-  -p <int>          Forces the port number upon which ntee will serve to the
+  -p &lt;int&gt;          Forces the port number upon which ntee will serve to the
                     R side process.  This is here in case the R program has
                     its connection hardcoded to use a certain port.
-  -L <ip> <int>     The ip address and port number of the L side process.
+  -L &lt;ip&gt; &lt;int&gt;     The ip address and port number of the L side process.
                     ntee will connect to this process after the R side program
                     has been started and decides to connect with ntees service
                     port.
-  -R <cmd> [args]   The user specifies the R side process by giving its
+  -R &lt;cmd&gt; [args]   The user specifies the R side process by giving its
                     command line argument, the special argument @NTEEPORT can
                     be inserted anywhere in the args where the port number
                     that the process would connect would ordinarily be specified
@@ -86,18 +86,19 @@ Flags:
                     to the value which is being used for the ntee service port.
 
 Notes:
-  Both the -l and -r arguments must be specified for ntee to start properly.
+  Both the -L and -R arguments must be specified for ntee to start properly.
 
-</p><h2>Dependencies</h2>
-<p>gcc-c++-4.4.3-4.fc12.i686
-doxygen-1.6.1-1.fc12.i686
-boost-1.39.0-9.fc12.i686
-binutils-2.19.51.0.14-37.fc12.i686
-</p>
+</pre></p><h2>Dependencies</h2>
+<p><ul><li>gcc-c++-4.4.3-4.fc12.i686</li>
+<li>doxygen-1.6.1-1.fc12.i686</li>
+<li>boost-1.39.0-9.fc12.i686</li>
+<li>binutils-2.19.51.0.14-37.fc12.i686</li>
+</ul></p>
 <h2>Install</h2>
-<p>fork the code.
-cd to the src/ directory
-type: make all</p>
+<p><ul><li>git clone</li>
+<li>cd to the src/ directory</li>
+<li>type: make all</li>
+</ul></p>
 <h2>License</h2>
 <p>GPL2</p>
 <h2>Authors</h2>
