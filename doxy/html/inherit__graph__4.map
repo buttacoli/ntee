@@ -1,0 +1,4 @@
+<map id="G" name="G">
+<area shape="rect" href="$classntee_1_1_recorder.html" title="An interface class which abstracts the behavior of recording data." alt="" coords="5,5,131,32"/>
+<area shape="rect" href="$classntee_1_1_file_recorder.html" title="ntee::FileRecorder" alt="" coords="180,5,327,32"/>
+</map>
