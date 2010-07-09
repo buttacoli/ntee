@@ -1,4 +1,4 @@
-//! @mainpage <i>Network</i> tee (ntee)
+//! @mainpage (n)etwork tee
 //! @author M. Buttacoli
 //! last updated:  7/3/2010
 //! 

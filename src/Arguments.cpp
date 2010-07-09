@@ -78,9 +78,11 @@ Settings Arguments::parse( int argc, char** argv )
                  .info("Bad L-port number\n");
       }
       else if ( ! strcmp(argv[i],"-R") && i+1 <= last_arg_index ) {
-         ++i;  // skip the -R
-         for( ; i<argc; ++i ) 
-            s.R_cmd.push_back( argv[i] );
+         ++i;  // skip the -R 
+         s.R_cmd = &argv[i];
+         break;  // Skip the rest of the args, they belong to the R side command.
+                 // and we've got where they start which is enough for the execv
+                 // we'll use later.
       }
       else {
          std::cerr << "bad argument : " << argv[i] << "\n";
@@ -98,8 +100,10 @@ Settings Arguments::parse( int argc, char** argv )
              << named_value( s.L_host_ip )
              << named_value( s.L_port )
              << "s.R_cmd = [";
-   std::copy( s.R_cmd.begin(), s.R_cmd.end(), 
-              std::ostream_iterator<std::string>(std::cout,", "));
+   int n = 0;
+   while( s.R_cmd[n] != 0 ) {
+      std::cout << s.R_cmd[n++] << ", ";
+   } 
    std::cout << "]\n";
 
    return s;

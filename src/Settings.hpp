@@ -30,7 +30,7 @@ struct Settings {
    std::string output_filename;        //!< output file path name
    std::string L_host_ip;              //!< IP address of the L program
    unsigned short L_port;              //!< Port at which L is listening
-   std::vector<std::string> R_cmd;     //!< Command line args to start R with
+   char** R_cmd;                       //!< Command line args to start R with
 
    
    //! @brief Initializes a default Settings structure.

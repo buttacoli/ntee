@@ -14,7 +14,7 @@ namespace ntee {
 //!
 NTee* Builder::build( const Settings& s )
 {
-   return new NTee();
+   return new NTee(s);
 }
 
 }
