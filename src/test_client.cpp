@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
+#include <iterator>
 #include <string>
 #include <string.h>
 #include <sys/types.h>
@@ -37,6 +39,11 @@ static int recv( int sock )
 //!
 int main(int argc, char** argv)
 {
+   // echo the command line
+   std::cout << "testCli started command:\n\t";
+   std::copy(argv, &argv[argc], std::ostream_iterator<char*>(std::cout, " "));
+   std::cout << "\n";
+   
    std::string USAGE("Usage: testCli <server ip addr> <server port> [N pings=10]\n");
    ErrIf( argc < 3 ).info(USAGE);
 

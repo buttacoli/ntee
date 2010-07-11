@@ -16,7 +16,7 @@ NTEE_SOURCE := ntee_main.cpp \
                FileRecorder.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
-               
+NTEE_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(NTEE_SOURCE)))
                
                
                
@@ -47,14 +47,14 @@ $(BIN)/testSrv: test_server.cpp Error.cpp Error.hpp Socket.hpp
 
 
 clean:
-	-rm $(BIN)/{testCli,testSrv}
+	-rm $(NTEE_OBJ) $(NTEE_DEPS) $(LIB)/ntee.a $(BIN)/{ntee,testCli,testSrv}
 
 
 
 ## Include all the .d files (fails the first time, but that's ok, make
 ## just keeps on processing)... These are formatted to LOOK like dependency
 ## targets specific to each cpp file.
-include $(patsubst %, .%, $(subst .cpp,.d,$(NTEE_SOURCE))) 
+include $(NTEE_DEPS) 
 
 
 ## This is the rule for generating a .d from a .cpp.  It utilizes the fact
@@ -63,7 +63,7 @@ include $(patsubst %, .%, $(subst .cpp,.d,$(NTEE_SOURCE)))
 ## of the filename (file without the suffix). The $$$$ is just a pid. The
 ## resulting target looks like "X.o X.d : X.cpp wha-wha-from-gcc"
 .%.d:%.cpp
-	$(CPP) -M $(CPPFLAGS) $< > $@.$$$$; \
+	$(CPP) -MM $(CPPFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
         
