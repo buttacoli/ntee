@@ -76,35 +76,39 @@
 <a name="l00078"></a>00078                  .info(<span class="stringliteral">&quot;Bad L-port number\n&quot;</span>);
 <a name="l00079"></a>00079       }
 <a name="l00080"></a>00080       <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( ! strcmp(argv[i],<span class="stringliteral">&quot;-R&quot;</span>) &amp;&amp; i+1 &lt;= last_arg_index ) {
-<a name="l00081"></a>00081          ++i;  <span class="comment">// skip the -R</span>
-<a name="l00082"></a>00082          <span class="keywordflow">for</span>( ; i&lt;argc; ++i ) 
-<a name="l00083"></a>00083             s.<a class="code" href="structntee_1_1_settings.html#a2b6593c849e26d0556cd1de185b4a3e8" title="Command line args to start R with.">R_cmd</a>.push_back( argv[i] );
-<a name="l00084"></a>00084       }
-<a name="l00085"></a>00085       <span class="keywordflow">else</span> {
-<a name="l00086"></a>00086          std::cerr &lt;&lt; <span class="stringliteral">&quot;bad argument : &quot;</span> &lt;&lt; argv[i] &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00087"></a>00087          std::exit(0);
-<a name="l00088"></a>00088       }
-<a name="l00089"></a>00089       ++i;
-<a name="l00090"></a>00090    }
-<a name="l00091"></a>00091    
-<a name="l00092"></a>00092    <span class="comment">//Print the structure</span>
-<a name="l00094"></a>00094 <span class="comment"></span><span class="preprocessor">   #define named_value( expr ) #expr &lt;&lt; &quot; = &quot; &lt;&lt; (expr) &lt;&lt; &quot;\n&quot;</span>
-<a name="l00095"></a>00095 <span class="preprocessor"></span>   std::cout &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a72b416f02b5d9db4e9b14b98796bb75e" title="protocol to use when connecting">protocol</a> )
-<a name="l00096"></a>00096              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a2d7c1cba5f83e3354b668b3304f30a00" title="port to start on (0 means wildcard!)">srv_port</a> )
-<a name="l00097"></a>00097              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a3302716eaae792cf5977461c8759e275" title="output file path name">output_filename</a> )
-<a name="l00098"></a>00098              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a0c96ee9be4f1eae5833f12449428999e" title="IP address of the L program.">L_host_ip</a> )
-<a name="l00099"></a>00099              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a55954dbdad9bd3c13677e94618388a16" title="Port at which L is listening.">L_port</a> )
-<a name="l00100"></a>00100              &lt;&lt; <span class="stringliteral">&quot;s.R_cmd = [&quot;</span>;
-<a name="l00101"></a>00101    std::copy( s.<a class="code" href="structntee_1_1_settings.html#a2b6593c849e26d0556cd1de185b4a3e8" title="Command line args to start R with.">R_cmd</a>.begin(), s.<a class="code" href="structntee_1_1_settings.html#a2b6593c849e26d0556cd1de185b4a3e8" title="Command line args to start R with.">R_cmd</a>.end(), 
-<a name="l00102"></a>00102               std::ostream_iterator&lt;std::string&gt;(std::cout,<span class="stringliteral">&quot;, &quot;</span>));
-<a name="l00103"></a>00103    std::cout &lt;&lt; <span class="stringliteral">&quot;]\n&quot;</span>;
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105    <span class="keywordflow">return</span> s;
-<a name="l00106"></a>00106 }
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108 } <span class="comment">/* end namespace ntee */</span>
+<a name="l00081"></a>00081          ++i;  <span class="comment">// skip the -R </span>
+<a name="l00082"></a>00082          s.<a class="code" href="structntee_1_1_settings.html#abb2c393223cbd8468007dc23744b469b" title="Command line args to start R with.">R_cmd</a> = &amp;argv[i];
+<a name="l00083"></a>00083          <span class="keywordflow">break</span>;  <span class="comment">// Skip the rest of the args, they belong to the R side command.</span>
+<a name="l00084"></a>00084                  <span class="comment">// and we&apos;ve got where they start which is enough for the execv</span>
+<a name="l00085"></a>00085                  <span class="comment">// we&apos;ll use later.</span>
+<a name="l00086"></a>00086       }
+<a name="l00087"></a>00087       <span class="keywordflow">else</span> {
+<a name="l00088"></a>00088          std::cerr &lt;&lt; <span class="stringliteral">&quot;bad argument : &quot;</span> &lt;&lt; argv[i] &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00089"></a>00089          std::exit(0);
+<a name="l00090"></a>00090       }
+<a name="l00091"></a>00091       ++i;
+<a name="l00092"></a>00092    }
+<a name="l00093"></a>00093    
+<a name="l00094"></a>00094    <span class="comment">//Print the structure</span>
+<a name="l00096"></a>00096 <span class="comment"></span><span class="preprocessor">   #define named_value( expr ) #expr &lt;&lt; &quot; = &quot; &lt;&lt; (expr) &lt;&lt; &quot;\n&quot;</span>
+<a name="l00097"></a>00097 <span class="preprocessor"></span>   std::cout &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a72b416f02b5d9db4e9b14b98796bb75e" title="protocol to use when connecting">protocol</a> )
+<a name="l00098"></a>00098              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a2d7c1cba5f83e3354b668b3304f30a00" title="port to start on (0 means wildcard!)">srv_port</a> )
+<a name="l00099"></a>00099              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a3302716eaae792cf5977461c8759e275" title="output file path name">output_filename</a> )
+<a name="l00100"></a>00100              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a0c96ee9be4f1eae5833f12449428999e" title="IP address of the L program.">L_host_ip</a> )
+<a name="l00101"></a>00101              &lt;&lt; named_value( s.<a class="code" href="structntee_1_1_settings.html#a55954dbdad9bd3c13677e94618388a16" title="Port at which L is listening.">L_port</a> )
+<a name="l00102"></a>00102              &lt;&lt; <span class="stringliteral">&quot;s.R_cmd = [&quot;</span>;
+<a name="l00103"></a>00103    <span class="keywordtype">int</span> n = 0;
+<a name="l00104"></a>00104    <span class="keywordflow">while</span>( s.<a class="code" href="structntee_1_1_settings.html#abb2c393223cbd8468007dc23744b469b" title="Command line args to start R with.">R_cmd</a>[n] != 0 ) {
+<a name="l00105"></a>00105       std::cout &lt;&lt; s.<a class="code" href="structntee_1_1_settings.html#abb2c393223cbd8468007dc23744b469b" title="Command line args to start R with.">R_cmd</a>[n++] &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;
+<a name="l00106"></a>00106    } 
+<a name="l00107"></a>00107    std::cout &lt;&lt; <span class="stringliteral">&quot;]\n&quot;</span>;
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109    <span class="keywordflow">return</span> s;
+<a name="l00110"></a>00110 }
+<a name="l00111"></a>00111 
+<a name="l00112"></a>00112 } <span class="comment">/* end namespace ntee */</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 8 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

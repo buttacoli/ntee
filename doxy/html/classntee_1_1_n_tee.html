@@ -28,23 +28,125 @@
 </div>
 <div class="contents">
 <h1>ntee::NTee Class Reference</h1><!-- doxytag: class="ntee::NTee" -->
+<p>This is the main class of the project.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for ntee::NTee:</div>
+<div class="dynsection">
+<div class="center"><img src="classntee_1_1_n_tee__coll__graph.png" border="0" usemap="#ntee_1_1_n_tee_coll__map" alt="Collaboration graph"/></div>
+<map name="ntee_1_1_n_tee_coll__map" id="ntee_1_1_n_tee_coll__map">
+<area shape="rect" href="structntee_1_1_settings.html" title="Structure to hold ntee configuration." alt="" coords="5,7,125,33"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+
 <p><a href="classntee_1_1_n_tee-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1e7cd07fa255b81b4a57b46a2649162"></a><!-- doxytag: member="ntee::NTee::start" ref="af1e7cd07fa255b81b4a57b46a2649162" args="()" -->
-virtual int&nbsp;</td><td class="memItemRight" valign="bottom"><b>start</b> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe21e4398d057ae802e0a828a0b08f66"></a><!-- doxytag: member="ntee::NTee::addRecorder" ref="abe21e4398d057ae802e0a828a0b08f66" args="(const boost::shared_ptr&lt; Recorder &gt; &amp;)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addRecorder</b> (const boost::shared_ptr&lt; <a class="el" href="classntee_1_1_recorder.html">Recorder</a> &gt; &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_n_tee.html#a93f4842c1cb091bf81a7337c2622e9b4">NTee</a> (const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;s)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad77bfbde9f5956808df41a80dd766cb3"></a><!-- doxytag: member="ntee::NTee::~NTee" ref="ad77bfbde9f5956808df41a80dd766cb3" args="()" -->
+virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_n_tee.html#ad77bfbde9f5956808df41a80dd766cb3">~NTee</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. Virtual so deriving classes can write their own if need be. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_n_tee.html#af1e7cd07fa255b81b4a57b46a2649162">start</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Begins the services.  <a href="#af1e7cd07fa255b81b4a57b46a2649162"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_n_tee.html#abe21e4398d057ae802e0a828a0b08f66">addRecorder</a> (const boost::shared_ptr&lt; <a class="el" href="classntee_1_1_recorder.html">Recorder</a> &gt; &amp;)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds a data recorder to the <a class="el" href="classntee_1_1_n_tee.html" title="This is the main class of the project.">NTee</a> list.  <a href="#abe21e4398d057ae802e0a828a0b08f66"></a><br/></td></tr>
+<tr><td colspan="2"><h2>Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1c344cf041e5fc6d4045c009028213e"></a><!-- doxytag: member="ntee::NTee::s_" ref="ad1c344cf041e5fc6d4045c009028213e" args="" -->
+const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>s_</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>This is the main class of the project. </p>
 
-<p>Definition at line <a class="el" href="_n_tee_8hpp_source.html#l00018">18</a> of file <a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_n_tee_8hpp_source.html#l00028">28</a> of file <a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>.</p>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a93f4842c1cb091bf81a7337c2622e9b4"></a><!-- doxytag: member="ntee::NTee::NTee" ref="a93f4842c1cb091bf81a7337c2622e9b4" args="(const Settings &amp;s)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ntee::NTee::NTee </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>s</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Instantiates a <a class="el" href="classntee_1_1_n_tee.html" title="This is the main class of the project.">NTee</a> instance with provided settings.</p>
+<p>Creates the instance, and stores a const reference to the <a class="el" href="structntee_1_1_settings.html" title="Structure to hold ntee configuration.">Settings</a> structure into protected member so deriving classes can utilize it directly.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>s</em>&nbsp;</td><td>The filled in <a class="el" href="structntee_1_1_settings.html" title="Structure to hold ntee configuration.">Settings</a> structure to work off of. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00024">24</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="abe21e4398d057ae802e0a828a0b08f66"></a><!-- doxytag: member="ntee::NTee::addRecorder" ref="abe21e4398d057ae802e0a828a0b08f66" args="(const boost::shared_ptr&lt; Recorder &gt; &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ntee::NTee::addRecorder </td>
+          <td>(</td>
+          <td class="paramtype">const boost::shared_ptr&lt; <a class="el" href="classntee_1_1_recorder.html">Recorder</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>r</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Adds a data recorder to the <a class="el" href="classntee_1_1_n_tee.html" title="This is the main class of the project.">NTee</a> list. </p>
+<p>Data recorders are signaled when a new message is pulled off one of the sockets and they should log the data appropriately.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>r</em>&nbsp;</td><td>Address of a dynamically allocated <a class="el" href="classntee_1_1_recorder.html" title="An interface class which abstracts the behavior of recording data.">Recorder</a> instance which has been wrapped into a boost::shared_ptr. The shared_ptr will be inserted into a list, and will be deleted when its reference count drops to zero. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00186">186</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af1e7cd07fa255b81b4a57b46a2649162"></a><!-- doxytag: member="ntee::NTee::start" ref="af1e7cd07fa255b81b4a57b46a2649162" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ntee::NTee::start </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Begins the services. </p>
+<p>This is the primary interface which clients call to start the ntee middle man service. First step, listen for the R side client. Next step, connect with the L side service. From this point forward the two processes are now in communication through ntee, this routine falls into an infinite select loop on both the R side and L side connection points.</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>status of the commands. In reality though, the program exits when it first goes wrong, which is really not a good thing because this is supposed to be a LIBRARY routine. TODO: fix this problem. </dd></dl>
+
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00133">133</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/mbuttaco/ntee/src/<a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a></li>
 <li>/home/mbuttaco/ntee/src/<a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 8 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
