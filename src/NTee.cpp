@@ -2,6 +2,9 @@
 #include "Error.hpp"
 #include "Socket.hpp"
 #include "Settings.hpp"
+#include "comm.hpp"
+#include <algorithm>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -117,6 +120,57 @@ Socket NTee::constructService( sockaddr_in* psa, socklen_t* plen )
 
 
 
+//! @brief  Listens to both the L and R sockets.
+//!
+//! This routine will listen to both the L and R side sockets, and pass 
+//! any information recieved from one side to the other as well as make
+//! a recording of the communication.
+void NTee::startListening()
+{
+   int rc=0;
+   fd_set rd_fds;
+   int max = std::max(Lsock_,Rsock_);
+
+   // force both L and R sockets to be non-blocking IO.
+   fcntl(Lsock_, F_SETFL, O_NONBLOCK);
+   fcntl(Rsock_, F_SETFL, O_NONBLOCK);
+      
+   FD_ZERO(&rd_fds);
+   FD_SET(Lsock_, &rd_fds);
+   FD_SET(Rsock_, &rd_fds);
+   
+   std::string msg;
+   std::cout << "Polling\n";
+   char buf[1024];
+   
+   while( (rc=select(max+1, &rd_fds, 0, 0, 0)) > 0 ) {
+      std::cout << "Select returned: " << rc << "\n";
+      if ( FD_ISSET( Lsock_, &rd_fds ) ) {
+         int len = read_n( Lsock_, buf, sizeof(buf) );
+         std::cout << "Reading from Lsock --> Rsock (" << len << ")\n";
+         if ( len > 0 )
+            write_n( Rsock_, buf, len );
+         else
+            close(Lsock_);
+      }
+      if ( FD_ISSET( Rsock_, &rd_fds ) ) {
+         int len = read_n( Rsock_, buf, sizeof(buf) );
+         std::cout << "Reading from Rsock --> Lsock (" << len << ")\n";
+         if ( len > 0 ) 
+            write_n( Lsock_, buf, len );
+         else
+            close(Rsock_);
+      }
+      
+      FD_ZERO(&rd_fds);
+      FD_SET(Lsock_, &rd_fds);
+      FD_SET(Rsock_, &rd_fds);
+      
+      sleep(1);
+   }
+   
+}   
+
 //! @brief  Begins the services.
 //!
 //! This is the primary interface which clients call to start the ntee 
@@ -141,8 +195,7 @@ int NTee::start()
    startChildProc();
          
    // Back in the parent (ntee) otherwise we'd have exited.
-   Socket Rsock;
-   SysErrIf( (Rsock=accept(sock, reinterpret_cast<sockaddr*>(&addr),
+   SysErrIf( (Rsock_=accept(sock, reinterpret_cast<sockaddr*>(&addr),
                              &len)) == -1 );
       
    // Report the client connection.
@@ -152,9 +205,8 @@ int NTee::start()
              << ":" << ntohs(addr.sin_port) << "\n";
    
    //** R process has connected... time to connect to the L process.
-   Socket Lsock;
    int type = (s_.protocol==Settings::TCP)? SOCK_STREAM : SOCK_DGRAM;   
-   SysErrIf( (Lsock=socket(AF_INET, type, 0 )) == -1 );
+   SysErrIf( (Lsock_=socket(AF_INET, type, 0 )) == -1 );
 
    // Set up the internet address and port 
    memset(&addr, 0, sizeof(addr));
@@ -163,12 +215,15 @@ int NTee::start()
    addr.sin_family = AF_INET;
    addr.sin_port = htons(s_.L_port);
 
-   SysErrIf( connect(Lsock, reinterpret_cast<sockaddr*>(&addr),
+   SysErrIf( connect(Lsock_, reinterpret_cast<sockaddr*>(&addr),
                      sizeof(addr)) == -1 );
                        
    std::cout << "NTee connected to L side: " << s_.L_host_ip << ":"
              << s_.L_port << "\n";
-             
+   
+   //** Start listening to both sides and passing the information.
+   startListening();
+   
    return 0;
 }
 

@@ -13,7 +13,8 @@ NTEE_SOURCE := ntee_main.cpp \
                Builder.cpp \
                Error.cpp \
                NTee.cpp \
-               FileRecorder.cpp
+               FileRecorder.cpp \
+               comm.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
 NTEE_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(NTEE_SOURCE)))

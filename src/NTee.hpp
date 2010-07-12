@@ -41,10 +41,13 @@ private:
    
    void startChildProc();
    Socket constructService( sockaddr_in*, socklen_t* );
+   void startListening();
    
    std::list<boost::shared_ptr<Recorder> > recorders_;
    std::string serverhost_;
    unsigned int srvPort_;
+   Socket Lsock_;
+   Socket Rsock_;
 };
 
 } // end namespace ntee
