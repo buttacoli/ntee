@@ -166,7 +166,6 @@ void NTee::startListening()
       FD_SET(Lsock_, &rd_fds);
       FD_SET(Rsock_, &rd_fds);
       
-      sleep(1);
    }
    
 }   
