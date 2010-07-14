@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <iostream>
+#include <stdlib.h>
 
 
 //! @brief  Write a full buffer.
@@ -104,7 +105,8 @@ size_t read_n( int fd, void* buf, size_t len )
 //! @brief Reads a full buffer into a C++ string
 //!
 //! This is different from the void* read_n version in that the read continues
-//! to read until it reaches an end of file marker.
+//! to read until it reaches an end of file marker.  This works for streams that
+//! carry ascii text, but for binary streams its not very useful.
 //!
 //! @param fd  File descriptor
 //! @param s   String to write to.
@@ -137,4 +139,24 @@ size_t read_n( int fd, std::string& s )
    }
    return s.length();
 }
+
+
+
+size_t read_n( int fd, char** buf, size_t allocsz )
+{
+   *buf = (char*) malloc(allocsz);
+   char* p = *buf;
+
+   size_t total = 0;
+   size_t got = 0;
+   while ( (got=read_n(fd, p, allocsz)) == allocsz ) {
+      total += got;
+      *buf = (char*) realloc( *buf, total+allocsz );
+      p = *buf + total;
+      if ( *buf == 0 ) 
+         throw std::bad_alloc();
+   }
    
+   return total+got;
+}
+         

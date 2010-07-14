@@ -13,6 +13,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <cstdio>
+#include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
 
 namespace ntee {
@@ -145,22 +147,11 @@ void NTee::startListening()
    
    while( (rc=select(max+1, &rd_fds, 0, 0, 0)) > 0 ) {
       std::cout << "Select returned: " << rc << "\n";
-      if ( FD_ISSET( Lsock_, &rd_fds ) ) {
-         int len = read_n( Lsock_, buf, sizeof(buf) );
-         std::cout << "Reading from Lsock --> Rsock (" << len << ")\n";
-         if ( len > 0 )
-            write_n( Rsock_, buf, len );
-         else
-            close(Lsock_);
-      }
-      if ( FD_ISSET( Rsock_, &rd_fds ) ) {
-         int len = read_n( Rsock_, buf, sizeof(buf) );
-         std::cout << "Reading from Rsock --> Lsock (" << len << ")\n";
-         if ( len > 0 ) 
-            write_n( Lsock_, buf, len );
-         else
-            close(Rsock_);
-      }
+      if ( FD_ISSET( Lsock_, &rd_fds ) )
+         transfer(Lsock_,Rsock_);
+         
+      if ( FD_ISSET( Rsock_, &rd_fds ) )
+         transfer(Rsock_,Lsock_);
       
       FD_ZERO(&rd_fds);
       FD_SET(Lsock_, &rd_fds);
@@ -169,6 +160,35 @@ void NTee::startListening()
    }
    
 }   
+
+
+void NTee::transfer( const Socket& from, const Socket& to )
+{
+   char* buf = 0;
+   size_t len = read_n( from, &buf );
+   boost::shared_ptr<char> ptr( buf, free );
+
+   std::cout << "Reading from " << from << " --> " 
+             << to << " (" << len << ")\n";
+   if ( len > 0 )
+      write_n( to, buf, len );
+   else
+      close(from);
+
+   alertRecorders(from, to, buf, len);
+}
+
+
+
+void NTee::alertRecorders(const Socket& from, const Socket& to, 
+                          const char* buf, 
+                          size_t len)
+{
+   std::for_each( recorders_.begin(), recorders_.end(),
+                  boost::bind(&Recorder::record, _1) );
+}
+
+
 
 //! @brief  Begins the services.
 //!

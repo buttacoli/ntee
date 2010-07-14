@@ -14,8 +14,11 @@
 
 static int send( int sock, int nb )
 {
-   static char buf[1024];
-   if ( nb > 1024 ) nb=1024; 
+   static char buf[16384];
+   if ( buf[0] == 0 )
+      memset( buf, 'X', sizeof(buf));
+      
+   if ( nb > 16384 ) nb=16384; 
    std::cout << "sending: " << nb << "\n";     
    return send( sock, buf, nb, 0 );
 }

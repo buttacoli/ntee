@@ -42,6 +42,9 @@ private:
    void startChildProc();
    Socket constructService( sockaddr_in*, socklen_t* );
    void startListening();
+   void transfer(const Socket&, const Socket& );
+   void alertRecorders( const Socket&, const Socket&, 
+                        const char*, size_t len );
    
    std::list<boost::shared_ptr<Recorder> > recorders_;
    std::string serverhost_;

@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 #include <boost/lexical_cast.hpp>
 #include "Error.hpp"
 #include "Socket.hpp"
@@ -53,7 +56,7 @@ int main(int argc, char** argv)
      WarnIf( inet_ntop(AF_INET, &addr, cliName, sizeof(cliName) ) == 0 );
      std::cout << "CONNECTED to: " << ((cliName)?cliName:"Unknown") 
                << ":" << addr.sin_port << "\n";
-               
+     
      handleClient( cliSock );
   
    }
@@ -70,15 +73,22 @@ int main(int argc, char** argv)
 //!
 void handleClient( Socket& cliSock ) {
 
-   int rnb;
-   static char buf[1024];
+   size_t rnb, total;
+   static char buf[1020];  // Hack! This is not 1024, just so when the client sends
+                           // that number of bytes, the recv call below won't block
+                           // and screw things up.
 
    while( 1 ) {
-      WarnIf( (rnb=recv(cliSock,buf,sizeof(buf),0)) == -1 );     
-      if ( rnb == 0 ) break;
-      std::cout << "    RECIEVED " << rnb << " bytes\n"; 
+      total = 0;
+      while ( (rnb=recv(cliSock,buf,sizeof(buf),0)) == 1020 ) {
+         total += rnb;
+      }
+      total += rnb;
+      if ( total == 0 ) return;
+      
+      std::cout << "    RECIEVED " << total << " bytes\n"; 
 
-      int snb = htonl(rnb);
+      size_t snb = htonl(total);
       WarnIf( (snb=send(cliSock, &snb, sizeof(snb), 0)) == -1 );
    } 
 }
