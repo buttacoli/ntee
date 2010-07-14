@@ -1,0 +1,27 @@
+NTEE
+  This program is meant to provide a command line interface into a tee program
+  which connects two client and server processes.  In other words its supposed
+  to act as a portal between two programs that would normally be a client and
+  server.
+  
+  As the in-between man, ntee will forward inbound traffic outbound as well as
+  record it to a file in hexidecimal format with each transmission having its
+  own line and being marked by a route and time at the front of each message.
+  
+  Two programs were developed first to act as the client and server test programs
+  then ntee was developed to act as a go-between.
+  
+  The idea is to make ntee a library which could be front-ended by a gui program.
+  
+    
+Getting Started:
+  1. You must have already cloned the git repo, so now your ready to build.
+  2. You must have the boost C++ libraries, make, and Doxygen installed, and then
+     cd into the src directory and type 'make all'.  This will build the testSrv
+     and testCli (test server and client) programs in <workarea>/bin, the ntee
+     library in  <workarea>/lib, and support programs, as well as run doxygen to
+     generate the documentation which will be placed in 
+     <workarea>/doxy/html/index.html
+
+Mike Buttacoli
+7/5/2010

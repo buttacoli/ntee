@@ -29,74 +29,84 @@
 <a name="l00006"></a>00006 <span class="preprocessor">#include &lt;sys/socket.h&gt;</span>
 <a name="l00007"></a>00007 <span class="preprocessor">#include &lt;netinet/in.h&gt;</span>
 <a name="l00008"></a>00008 <span class="preprocessor">#include &lt;arpa/inet.h&gt;</span>
-<a name="l00009"></a>00009 <span class="preprocessor">#include &lt;boost/lexical_cast.hpp&gt;</span>
-<a name="l00010"></a>00010 <span class="preprocessor">#include &quot;Error.hpp&quot;</span>
-<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;Socket.hpp&quot;</span>
-<a name="l00012"></a>00012 
-<a name="l00013"></a>00013 <span class="keyword">static</span> <span class="keywordtype">void</span> handleClient(<a class="code" href="struct_socket.html">Socket</a>&amp;);
-<a name="l00014"></a>00014 
-<a name="l00019"></a>00019 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)
-<a name="l00020"></a>00020 {
-<a name="l00021"></a>00021    std::string USAGE(<span class="stringliteral">&quot;Usage: testSrv &lt;server port&gt;\n&quot;</span>);
-<a name="l00022"></a>00022    ErrIf( argc &lt; 2 ).info(USAGE);
-<a name="l00023"></a>00023 
-<a name="l00024"></a>00024    <span class="comment">// Convert the port number arg to an int</span>
-<a name="l00025"></a>00025    in_port_t port;
-<a name="l00026"></a>00026    ErrIfCatch(boost::bad_lexical_cast,
-<a name="l00027"></a>00027               port = boost::lexical_cast&lt;in_port_t&gt;( argv[1] ))
-<a name="l00028"></a>00028              .info(<span class="stringliteral">&quot;%s is not a port number!\n&quot;</span>,argv[1]);
-<a name="l00029"></a>00029    
-<a name="l00030"></a>00030    <span class="comment">// Put the supplied ip addr into the sockaddr_in struct, we will reuse this</span>
-<a name="l00031"></a>00031    <span class="comment">// memory later to store client addresses in it as they connect.</span>
-<a name="l00032"></a>00032    sockaddr_in addr;
-<a name="l00033"></a>00033    memset( &amp;addr, 0, <span class="keyword">sizeof</span>(addr) );
-<a name="l00034"></a>00034    addr.sin_family = AF_INET;
-<a name="l00035"></a>00035    addr.sin_addr.s_addr = htonl(INADDR_ANY);  <span class="comment">// Wildcard address kernel picks best bind     </span>
-<a name="l00036"></a>00036    addr.sin_port = htons(port);
-<a name="l00037"></a>00037       
-<a name="l00038"></a>00038    
-<a name="l00039"></a>00039    <span class="comment">//** Get the server to accept stage</span>
-<a name="l00040"></a>00040    <a class="code" href="struct_socket.html">Socket</a> sock;
-<a name="l00041"></a>00041    SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
-<a name="l00042"></a>00042    SysErrIf( bind(sock, reinterpret_cast&lt;sockaddr*&gt;(&amp;addr), <span class="keyword">sizeof</span>(addr)) == -1 );
-<a name="l00043"></a>00043    SysErrIf( listen(sock, 5) == -1 );
-<a name="l00044"></a>00044    
-<a name="l00045"></a>00045    <span class="comment">//** Forever accept new connections and reply</span>
-<a name="l00046"></a>00046    <span class="keywordflow">for</span>( ;; ) {
-<a name="l00047"></a>00047      <a class="code" href="struct_socket.html">Socket</a> cliSock;
-<a name="l00048"></a>00048      memset( &amp;addr, 0, <span class="keyword">sizeof</span>(addr) );
-<a name="l00049"></a>00049      socklen_t len = <span class="keyword">sizeof</span>(addr);
-<a name="l00050"></a>00050      SysErrIf( (cliSock=accept(sock,reinterpret_cast&lt;sockaddr*&gt;(&amp;addr),&amp;len)) == -1 );
-<a name="l00051"></a>00051      
-<a name="l00052"></a>00052      <span class="keywordtype">char</span> cliName[INET_ADDRSTRLEN];
-<a name="l00053"></a>00053      WarnIf( inet_ntop(AF_INET, &amp;addr, cliName, <span class="keyword">sizeof</span>(cliName) ) == 0 );
-<a name="l00054"></a>00054      std::cout &lt;&lt; <span class="stringliteral">&quot;CONNECTED to: &quot;</span> &lt;&lt; ((cliName)?cliName:<span class="stringliteral">&quot;Unknown&quot;</span>) 
-<a name="l00055"></a>00055                &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; addr.sin_port &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00056"></a>00056                
-<a name="l00057"></a>00057      handleClient( cliSock );
-<a name="l00058"></a>00058   
-<a name="l00059"></a>00059    }
-<a name="l00060"></a>00060    
-<a name="l00061"></a>00061    <span class="keywordflow">return</span> 0;
-<a name="l00062"></a>00062 }
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 
-<a name="l00071"></a>00071 <span class="keywordtype">void</span> handleClient( <a class="code" href="struct_socket.html">Socket</a>&amp; cliSock ) {
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073    <span class="keywordtype">int</span> rnb;
-<a name="l00074"></a>00074    <span class="keyword">static</span> <span class="keywordtype">char</span> buf[1024];
+<a name="l00009"></a>00009 <span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<a name="l00010"></a>00010 <span class="preprocessor">#include &lt;fcntl.h&gt;</span>
+<a name="l00011"></a>00011 <span class="preprocessor">#include &lt;errno.h&gt;</span>
+<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;boost/lexical_cast.hpp&gt;</span>
+<a name="l00013"></a>00013 <span class="preprocessor">#include &quot;Error.hpp&quot;</span>
+<a name="l00014"></a>00014 <span class="preprocessor">#include &quot;Socket.hpp&quot;</span>
+<a name="l00015"></a>00015 
+<a name="l00016"></a>00016 <span class="keyword">static</span> <span class="keywordtype">void</span> handleClient(<a class="code" href="struct_socket.html">Socket</a>&amp;);
+<a name="l00017"></a>00017 
+<a name="l00022"></a>00022 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)
+<a name="l00023"></a>00023 {
+<a name="l00024"></a>00024    std::string USAGE(<span class="stringliteral">&quot;Usage: testSrv &lt;server port&gt;\n&quot;</span>);
+<a name="l00025"></a>00025    ErrIf( argc &lt; 2 ).info(USAGE);
+<a name="l00026"></a>00026 
+<a name="l00027"></a>00027    <span class="comment">// Convert the port number arg to an int</span>
+<a name="l00028"></a>00028    in_port_t port;
+<a name="l00029"></a>00029    ErrIfCatch(boost::bad_lexical_cast,
+<a name="l00030"></a>00030               port = boost::lexical_cast&lt;in_port_t&gt;( argv[1] ))
+<a name="l00031"></a>00031              .info(<span class="stringliteral">&quot;%s is not a port number!\n&quot;</span>,argv[1]);
+<a name="l00032"></a>00032    
+<a name="l00033"></a>00033    <span class="comment">// Put the supplied ip addr into the sockaddr_in struct, we will reuse this</span>
+<a name="l00034"></a>00034    <span class="comment">// memory later to store client addresses in it as they connect.</span>
+<a name="l00035"></a>00035    sockaddr_in addr;
+<a name="l00036"></a>00036    memset( &amp;addr, 0, <span class="keyword">sizeof</span>(addr) );
+<a name="l00037"></a>00037    addr.sin_family = AF_INET;
+<a name="l00038"></a>00038    addr.sin_addr.s_addr = htonl(INADDR_ANY);  <span class="comment">// Wildcard address kernel picks best bind     </span>
+<a name="l00039"></a>00039    addr.sin_port = htons(port);
+<a name="l00040"></a>00040       
+<a name="l00041"></a>00041    
+<a name="l00042"></a>00042    <span class="comment">//** Get the server to accept stage</span>
+<a name="l00043"></a>00043    <a class="code" href="struct_socket.html">Socket</a> sock;
+<a name="l00044"></a>00044    SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
+<a name="l00045"></a>00045    SysErrIf( bind(sock, reinterpret_cast&lt;sockaddr*&gt;(&amp;addr), <span class="keyword">sizeof</span>(addr)) == -1 );
+<a name="l00046"></a>00046    SysErrIf( listen(sock, 5) == -1 );
+<a name="l00047"></a>00047    
+<a name="l00048"></a>00048    <span class="comment">//** Forever accept new connections and reply</span>
+<a name="l00049"></a>00049    <span class="keywordflow">for</span>( ;; ) {
+<a name="l00050"></a>00050      <a class="code" href="struct_socket.html">Socket</a> cliSock;
+<a name="l00051"></a>00051      memset( &amp;addr, 0, <span class="keyword">sizeof</span>(addr) );
+<a name="l00052"></a>00052      socklen_t len = <span class="keyword">sizeof</span>(addr);
+<a name="l00053"></a>00053      SysErrIf( (cliSock=accept(sock,reinterpret_cast&lt;sockaddr*&gt;(&amp;addr),&amp;len)) == -1 );
+<a name="l00054"></a>00054      
+<a name="l00055"></a>00055      <span class="keywordtype">char</span> cliName[INET_ADDRSTRLEN];
+<a name="l00056"></a>00056      WarnIf( inet_ntop(AF_INET, &amp;addr, cliName, <span class="keyword">sizeof</span>(cliName) ) == 0 );
+<a name="l00057"></a>00057      std::cout &lt;&lt; <span class="stringliteral">&quot;CONNECTED to: &quot;</span> &lt;&lt; ((cliName)?cliName:<span class="stringliteral">&quot;Unknown&quot;</span>) 
+<a name="l00058"></a>00058                &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; addr.sin_port &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00059"></a>00059      
+<a name="l00060"></a>00060      handleClient( cliSock );
+<a name="l00061"></a>00061   
+<a name="l00062"></a>00062    }
+<a name="l00063"></a>00063    
+<a name="l00064"></a>00064    <span class="keywordflow">return</span> 0;
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 
+<a name="l00074"></a>00074 <span class="keywordtype">void</span> handleClient( <a class="code" href="struct_socket.html">Socket</a>&amp; cliSock ) {
 <a name="l00075"></a>00075 
-<a name="l00076"></a>00076    <span class="keywordflow">while</span>( 1 ) {
-<a name="l00077"></a>00077       WarnIf( (rnb=recv(cliSock,buf,<span class="keyword">sizeof</span>(buf),0)) == -1 );     
-<a name="l00078"></a>00078       <span class="keywordflow">if</span> ( rnb == 0 ) <span class="keywordflow">break</span>;
-<a name="l00079"></a>00079       std::cout &lt;&lt; <span class="stringliteral">&quot;    RECIEVED &quot;</span> &lt;&lt; rnb &lt;&lt; <span class="stringliteral">&quot; bytes\n&quot;</span>; 
+<a name="l00076"></a>00076    <span class="keywordtype">size_t</span> rnb, total;
+<a name="l00077"></a>00077    <span class="keyword">static</span> <span class="keywordtype">char</span> buf[1020];  <span class="comment">// Hack! This is not 1024, just so when the client sends</span>
+<a name="l00078"></a>00078                            <span class="comment">// that number of bytes, the recv call below won&apos;t block</span>
+<a name="l00079"></a>00079                            <span class="comment">// and screw things up.</span>
 <a name="l00080"></a>00080 
-<a name="l00081"></a>00081       <span class="keywordtype">int</span> snb = htonl(rnb);
-<a name="l00082"></a>00082       WarnIf( (snb=send(cliSock, &amp;snb, <span class="keyword">sizeof</span>(snb), 0)) == -1 );
-<a name="l00083"></a>00083    } 
-<a name="l00084"></a>00084 }
+<a name="l00081"></a>00081    <span class="keywordflow">while</span>( 1 ) {
+<a name="l00082"></a>00082       total = 0;
+<a name="l00083"></a>00083       <span class="keywordflow">while</span> ( (rnb=recv(cliSock,buf,<span class="keyword">sizeof</span>(buf),0)) == 1020 ) {
+<a name="l00084"></a>00084          total += rnb;
+<a name="l00085"></a>00085       }
+<a name="l00086"></a>00086       total += rnb;
+<a name="l00087"></a>00087       <span class="keywordflow">if</span> ( total == 0 ) <span class="keywordflow">return</span>;
+<a name="l00088"></a>00088       
+<a name="l00089"></a>00089       std::cout &lt;&lt; <span class="stringliteral">&quot;    RECIEVED &quot;</span> &lt;&lt; total &lt;&lt; <span class="stringliteral">&quot; bytes\n&quot;</span>; 
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091       <span class="keywordtype">size_t</span> snb = htonl(total);
+<a name="l00092"></a>00092       WarnIf( (snb=send(cliSock, &amp;snb, <span class="keyword">sizeof</span>(snb), 0)) == -1 );
+<a name="l00093"></a>00093    } 
+<a name="l00094"></a>00094 }
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

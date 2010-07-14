@@ -37,88 +37,91 @@
 <a name="l00014"></a>00014 
 <a name="l00015"></a>00015 <span class="keyword">static</span> <span class="keywordtype">int</span> send( <span class="keywordtype">int</span> sock, <span class="keywordtype">int</span> nb )
 <a name="l00016"></a>00016 {
-<a name="l00017"></a>00017    <span class="keyword">static</span> <span class="keywordtype">char</span> buf[1024];
-<a name="l00018"></a>00018    <span class="keywordflow">if</span> ( nb &gt; 1024 ) nb=1024; 
-<a name="l00019"></a>00019    std::cout &lt;&lt; <span class="stringliteral">&quot;sending: &quot;</span> &lt;&lt; nb &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;     
-<a name="l00020"></a>00020    <span class="keywordflow">return</span> send( sock, buf, nb, 0 );
-<a name="l00021"></a>00021 }
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="keyword">static</span> <span class="keywordtype">int</span> recv( <span class="keywordtype">int</span> sock )
-<a name="l00024"></a>00024 {
-<a name="l00025"></a>00025    uint32_t msg = 0;
-<a name="l00026"></a>00026    SysErrIf( recv( sock, &amp;msg, <span class="keyword">sizeof</span>(msg), 0 ) == -1 );
-<a name="l00027"></a>00027    msg = ntohl(msg); 
-<a name="l00028"></a>00028    std::cout &lt;&lt; <span class="stringliteral">&quot;recv: &quot;</span> &lt;&lt; msg &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00029"></a>00029    <span class="keywordflow">return</span> msg;
-<a name="l00030"></a>00030 }
-<a name="l00031"></a>00031 
-<a name="l00032"></a>00032 
-<a name="l00040"></a>00040 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)
-<a name="l00041"></a>00041 {
-<a name="l00042"></a>00042    <span class="comment">// echo the command line</span>
-<a name="l00043"></a>00043    std::cout &lt;&lt; <span class="stringliteral">&quot;testCli started command:\n\t&quot;</span>;
-<a name="l00044"></a>00044    std::copy(argv, &amp;argv[argc], std::ostream_iterator&lt;char*&gt;(std::cout, <span class="stringliteral">&quot; &quot;</span>));
-<a name="l00045"></a>00045    std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00046"></a>00046    
-<a name="l00047"></a>00047    std::string USAGE(<span class="stringliteral">&quot;Usage: testCli &lt;server ip addr&gt; &lt;server port&gt; [N pings=10]\n&quot;</span>);
-<a name="l00048"></a>00048    ErrIf( argc &lt; 3 ).info(USAGE);
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050    <span class="comment">//** Get the server address, port and maxPings arguments</span>
-<a name="l00051"></a>00051    std::string serverIP( argv[1] );
-<a name="l00052"></a>00052    
-<a name="l00053"></a>00053    in_port_t port;
-<a name="l00054"></a>00054    ErrIfCatch(boost::bad_lexical_cast,
-<a name="l00055"></a>00055               port = boost::lexical_cast&lt;in_port_t&gt;( argv[2] ))
-<a name="l00056"></a>00056              .info(<span class="stringliteral">&quot;%s is not a port number!\n&quot;</span>,argv[2]);
-<a name="l00057"></a>00057    
-<a name="l00058"></a>00058    <span class="comment">// Put the supplied ip addr into the sockaddr_in struct</span>
-<a name="l00059"></a>00059    sockaddr_in svAddr;
-<a name="l00060"></a>00060    memset( &amp;svAddr, 0, <span class="keyword">sizeof</span>(svAddr) );
-<a name="l00061"></a>00061    ErrIf( inet_pton(AF_INET, serverIP.c_str(), &amp;svAddr ) != 1 )
-<a name="l00062"></a>00062         .info(<span class="stringliteral">&quot;Unable to convert &apos;%s&apos; to an AF_INET address\n&quot;</span>,serverIP.c_str());
-<a name="l00063"></a>00063    
-<a name="l00064"></a>00064    svAddr.sin_family = AF_INET;     
-<a name="l00065"></a>00065    svAddr.sin_port = htons(port);
+<a name="l00017"></a>00017    <span class="keyword">static</span> <span class="keywordtype">char</span> buf[16384];
+<a name="l00018"></a>00018    <span class="keywordflow">if</span> ( buf[0] == 0 )
+<a name="l00019"></a>00019       memset( buf, <span class="charliteral">&apos;X&apos;</span>, <span class="keyword">sizeof</span>(buf));
+<a name="l00020"></a>00020       
+<a name="l00021"></a>00021    <span class="keywordflow">if</span> ( nb &gt; 16384 ) nb=16384; 
+<a name="l00022"></a>00022    std::cout &lt;&lt; <span class="stringliteral">&quot;sending: &quot;</span> &lt;&lt; nb &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;     
+<a name="l00023"></a>00023    <span class="keywordflow">return</span> send( sock, buf, nb, 0 );
+<a name="l00024"></a>00024 }
+<a name="l00025"></a>00025 
+<a name="l00026"></a>00026 <span class="keyword">static</span> <span class="keywordtype">int</span> recv( <span class="keywordtype">int</span> sock )
+<a name="l00027"></a>00027 {
+<a name="l00028"></a>00028    uint32_t msg = 0;
+<a name="l00029"></a>00029    SysErrIf( recv( sock, &amp;msg, <span class="keyword">sizeof</span>(msg), 0 ) == -1 );
+<a name="l00030"></a>00030    msg = ntohl(msg); 
+<a name="l00031"></a>00031    std::cout &lt;&lt; <span class="stringliteral">&quot;recv: &quot;</span> &lt;&lt; msg &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00032"></a>00032    <span class="keywordflow">return</span> msg;
+<a name="l00033"></a>00033 }
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035 
+<a name="l00043"></a>00043 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)
+<a name="l00044"></a>00044 {
+<a name="l00045"></a>00045    <span class="comment">// echo the command line</span>
+<a name="l00046"></a>00046    std::cout &lt;&lt; <span class="stringliteral">&quot;testCli started command:\n\t&quot;</span>;
+<a name="l00047"></a>00047    std::copy(argv, &amp;argv[argc], std::ostream_iterator&lt;char*&gt;(std::cout, <span class="stringliteral">&quot; &quot;</span>));
+<a name="l00048"></a>00048    std::cout &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00049"></a>00049    
+<a name="l00050"></a>00050    std::string USAGE(<span class="stringliteral">&quot;Usage: testCli &lt;server ip addr&gt; &lt;server port&gt; [N pings=10]\n&quot;</span>);
+<a name="l00051"></a>00051    ErrIf( argc &lt; 3 ).info(USAGE);
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053    <span class="comment">//** Get the server address, port and maxPings arguments</span>
+<a name="l00054"></a>00054    std::string serverIP( argv[1] );
+<a name="l00055"></a>00055    
+<a name="l00056"></a>00056    in_port_t port;
+<a name="l00057"></a>00057    ErrIfCatch(boost::bad_lexical_cast,
+<a name="l00058"></a>00058               port = boost::lexical_cast&lt;in_port_t&gt;( argv[2] ))
+<a name="l00059"></a>00059              .info(<span class="stringliteral">&quot;%s is not a port number!\n&quot;</span>,argv[2]);
+<a name="l00060"></a>00060    
+<a name="l00061"></a>00061    <span class="comment">// Put the supplied ip addr into the sockaddr_in struct</span>
+<a name="l00062"></a>00062    sockaddr_in svAddr;
+<a name="l00063"></a>00063    memset( &amp;svAddr, 0, <span class="keyword">sizeof</span>(svAddr) );
+<a name="l00064"></a>00064    ErrIf( inet_pton(AF_INET, serverIP.c_str(), &amp;svAddr ) != 1 )
+<a name="l00065"></a>00065         .info(<span class="stringliteral">&quot;Unable to convert &apos;%s&apos; to an AF_INET address\n&quot;</span>,serverIP.c_str());
 <a name="l00066"></a>00066    
-<a name="l00067"></a>00067    <span class="comment">// Get the last (optional) argument which is the number of times to send to the</span>
-<a name="l00068"></a>00068    <span class="comment">// server. Default to 10.</span>
-<a name="l00069"></a>00069    <span class="keywordtype">int</span> maxPings = 10;
-<a name="l00070"></a>00070    <span class="keywordflow">if</span> ( argc &gt; 3 ) {
-<a name="l00071"></a>00071       ErrIfCatch( boost::bad_lexical_cast,
-<a name="l00072"></a>00072                   maxPings=boost::lexical_cast&lt;int&gt;(argv[3]))
-<a name="l00073"></a>00073                .info(<span class="stringliteral">&quot;Couldn&apos;t convert num of pings arg: &apos;%s&apos; to an int\n&quot;</span>, argv[3]);
-<a name="l00074"></a>00074    }
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076 
-<a name="l00077"></a>00077    
-<a name="l00078"></a>00078    <span class="comment">//** Connect to the server</span>
-<a name="l00079"></a>00079    <a class="code" href="struct_socket.html">Socket</a> sock;
-<a name="l00080"></a>00080    SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
-<a name="l00081"></a>00081    SysErrIf( connect(sock, reinterpret_cast&lt;sockaddr*&gt;(&amp;svAddr), <span class="keyword">sizeof</span>(svAddr)) == -1 );
-<a name="l00082"></a>00082    
-<a name="l00083"></a>00083    <span class="comment">//** Send maxPing messages to the server, each progressively longer then the last</span>
-<a name="l00084"></a>00084    <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_RETRY = 3;
-<a name="l00085"></a>00085    <span class="keywordtype">int</span> pingCnt = 0;
-<a name="l00086"></a>00086    <span class="keywordflow">while</span>( pingCnt &lt; maxPings ) {
-<a name="l00087"></a>00087       
-<a name="l00088"></a>00088       <span class="keywordtype">int</span> snb=0;
-<a name="l00089"></a>00089       <span class="keywordtype">int</span> rnb=0;
-<a name="l00090"></a>00090       <span class="keywordtype">int</span> resend = 0;
-<a name="l00091"></a>00091       <span class="keywordflow">do</span> {
-<a name="l00092"></a>00092          SysErrIf( (snb = send( sock, 1&lt;&lt;pingCnt )) == -1 );
-<a name="l00093"></a>00093          SysErrIf( (rnb = recv( sock )) == -1 );
-<a name="l00094"></a>00094       } <span class="keywordflow">while</span>( resend++ &lt; MAX_RETRY &amp;&amp; rnb != snb );
-<a name="l00095"></a>00095       ErrIf( resend == MAX_RETRY )
-<a name="l00096"></a>00096          .info(<span class="stringliteral">&quot;Unable to checksum last packet, %d sent != %d recv\n&quot;</span>,snb,rnb);
-<a name="l00097"></a>00097          
-<a name="l00098"></a>00098       ++pingCnt; 
-<a name="l00099"></a>00099    }
-<a name="l00100"></a>00100    
-<a name="l00101"></a>00101    <span class="keywordflow">return</span> 0;
-<a name="l00102"></a>00102 }
-<a name="l00103"></a>00103 
+<a name="l00067"></a>00067    svAddr.sin_family = AF_INET;     
+<a name="l00068"></a>00068    svAddr.sin_port = htons(port);
+<a name="l00069"></a>00069    
+<a name="l00070"></a>00070    <span class="comment">// Get the last (optional) argument which is the number of times to send to the</span>
+<a name="l00071"></a>00071    <span class="comment">// server. Default to 10.</span>
+<a name="l00072"></a>00072    <span class="keywordtype">int</span> maxPings = 10;
+<a name="l00073"></a>00073    <span class="keywordflow">if</span> ( argc &gt; 3 ) {
+<a name="l00074"></a>00074       ErrIfCatch( boost::bad_lexical_cast,
+<a name="l00075"></a>00075                   maxPings=boost::lexical_cast&lt;int&gt;(argv[3]))
+<a name="l00076"></a>00076                .info(<span class="stringliteral">&quot;Couldn&apos;t convert num of pings arg: &apos;%s&apos; to an int\n&quot;</span>, argv[3]);
+<a name="l00077"></a>00077    }
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080    
+<a name="l00081"></a>00081    <span class="comment">//** Connect to the server</span>
+<a name="l00082"></a>00082    <a class="code" href="struct_socket.html">Socket</a> sock;
+<a name="l00083"></a>00083    SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
+<a name="l00084"></a>00084    SysErrIf( connect(sock, reinterpret_cast&lt;sockaddr*&gt;(&amp;svAddr), <span class="keyword">sizeof</span>(svAddr)) == -1 );
+<a name="l00085"></a>00085    
+<a name="l00086"></a>00086    <span class="comment">//** Send maxPing messages to the server, each progressively longer then the last</span>
+<a name="l00087"></a>00087    <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_RETRY = 3;
+<a name="l00088"></a>00088    <span class="keywordtype">int</span> pingCnt = 0;
+<a name="l00089"></a>00089    <span class="keywordflow">while</span>( pingCnt &lt; maxPings ) {
+<a name="l00090"></a>00090       
+<a name="l00091"></a>00091       <span class="keywordtype">int</span> snb=0;
+<a name="l00092"></a>00092       <span class="keywordtype">int</span> rnb=0;
+<a name="l00093"></a>00093       <span class="keywordtype">int</span> resend = 0;
+<a name="l00094"></a>00094       <span class="keywordflow">do</span> {
+<a name="l00095"></a>00095          SysErrIf( (snb = send( sock, 1&lt;&lt;pingCnt )) == -1 );
+<a name="l00096"></a>00096          SysErrIf( (rnb = recv( sock )) == -1 );
+<a name="l00097"></a>00097       } <span class="keywordflow">while</span>( resend++ &lt; MAX_RETRY &amp;&amp; rnb != snb );
+<a name="l00098"></a>00098       ErrIf( resend == MAX_RETRY )
+<a name="l00099"></a>00099          .info(<span class="stringliteral">&quot;Unable to checksum last packet, %d sent != %d recv\n&quot;</span>,snb,rnb);
+<a name="l00100"></a>00100          
+<a name="l00101"></a>00101       ++pingCnt; 
+<a name="l00102"></a>00102    }
+<a name="l00103"></a>00103    
+<a name="l00104"></a>00104    <span class="keywordflow">return</span> 0;
+<a name="l00105"></a>00105 }
+<a name="l00106"></a>00106 
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

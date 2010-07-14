@@ -62,18 +62,24 @@
 <a name="l00041"></a>00041    
 <a name="l00042"></a>00042    <span class="keywordtype">void</span> startChildProc();
 <a name="l00043"></a>00043    <a class="code" href="struct_socket.html">Socket</a> constructService( sockaddr_in*, socklen_t* );
-<a name="l00044"></a>00044    
-<a name="l00045"></a>00045    std::list&lt;boost::shared_ptr&lt;Recorder&gt; &gt; recorders_;
-<a name="l00046"></a>00046    std::string serverhost_;
-<a name="l00047"></a>00047    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> srvPort_;
-<a name="l00048"></a>00048 };
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050 } <span class="comment">// end namespace ntee</span>
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 <span class="preprocessor">#endif</span>
+<a name="l00044"></a>00044    <span class="keywordtype">void</span> startListening();
+<a name="l00045"></a>00045    <span class="keywordtype">void</span> transfer(<span class="keyword">const</span> <a class="code" href="struct_socket.html">Socket</a>&amp;, <span class="keyword">const</span> <a class="code" href="struct_socket.html">Socket</a>&amp; );
+<a name="l00046"></a>00046    <span class="keywordtype">void</span> alertRecorders( <span class="keyword">const</span> <a class="code" href="struct_socket.html">Socket</a>&amp;, <span class="keyword">const</span> <a class="code" href="struct_socket.html">Socket</a>&amp;, 
+<a name="l00047"></a>00047                         <span class="keyword">const</span> <span class="keywordtype">char</span>*, <span class="keywordtype">size_t</span> len );
+<a name="l00048"></a>00048    
+<a name="l00049"></a>00049    std::list&lt;boost::shared_ptr&lt;Recorder&gt; &gt; recorders_;
+<a name="l00050"></a>00050    std::string serverhost_;
+<a name="l00051"></a>00051    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> srvPort_;
+<a name="l00052"></a>00052    <a class="code" href="struct_socket.html">Socket</a> Lsock_;
+<a name="l00053"></a>00053    <a class="code" href="struct_socket.html">Socket</a> Rsock_;
+<a name="l00054"></a>00054 };
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 } <span class="comment">// end namespace ntee</span>
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

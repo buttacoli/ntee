@@ -84,9 +84,16 @@ Flags:
                     that the process would connect would ordinarily be specified
                     with.  Ntee will also define the $NTEEPORT environment var
                     to the value which is being used for the ntee service port.
+                    NOTE: Because the argument parsing fills the array holding
+                          the command specified with any and all remaining args,
+                          the -R specification MUST BE THE LAST thing on the
+                          command line!  Other options the follow -R will be
+                          used in the starting of the R side client and not as
+                          settings for ntee.
 
 Notes:
-  Both the -L and -R arguments must be specified for ntee to start properly.
+  - Both the -L and -R arguments must be specified for ntee to start properly.
+  - The -R option must be the final option passed to ntee!
 
 </pre></p><h2>Dependencies</h2>
 <p><ul><li>gcc-c++-4.4.3-4.fc12.i686</li>
