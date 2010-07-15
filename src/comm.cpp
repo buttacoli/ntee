@@ -141,7 +141,24 @@ size_t read_n( int fd, std::string& s )
 }
 
 
-
+//! @brief Dynamically allocates buffer as it is read.
+//!
+//! This routine will allocate a buffer of the proper length to hold the 
+//! entire stream of data from a file descriptor.  Allocation is done with
+//! malloc, and re-alloc routines, and it is the client's responsibility
+//! to free the memory with free() when it is done with.
+//!
+//! @param fd   File descriptor to read from
+//! @param buf  pointer to a character pointer to set with the address of 
+//!              the final allocated buffer.  In case of an allocation 
+//!              error this pointer will contain undefined contents.
+//! @param allocsz This is a hint at how much to allocate when reading a 
+//!                buffer.  If the client doesn't pass this argument, it
+//!                will default to 1024 bytes.
+//!
+//! @returns integer length of allocated buffer and the pointer at buf will
+//!           be assigned with the address of the allocated buffer.
+//!
 size_t read_n( int fd, char** buf, size_t allocsz )
 {
    *buf = (char*) malloc(allocsz);

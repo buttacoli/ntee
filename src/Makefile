@@ -14,6 +14,7 @@ NTEE_SOURCE := ntee_main.cpp \
                Error.cpp \
                NTee.cpp \
                FileRecorder.cpp \
+               Socket.cpp \
                comm.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
@@ -36,13 +37,13 @@ $(LIB)/ntee.a: $(NTEE_OBJ)
 
 $(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ -lrt
 
-$(BIN)/testCli: test_client.cpp Error.cpp Error.hpp Socket.hpp
+$(BIN)/testCli: test_client.cpp $(LIB)/ntee.a Error.hpp Socket.hpp
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
-$(BIN)/testSrv: test_server.cpp Error.cpp Error.hpp Socket.hpp
+$(BIN)/testSrv: test_server.cpp $(LIB)/ntee.a Error.hpp Socket.hpp
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 

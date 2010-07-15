@@ -20,7 +20,9 @@ class Settings;
 class Recorder {
 public:
    virtual ~Recorder() {}
-   virtual void record() = 0;
+   virtual void record( const Socket& from, const Socket& to, 
+                        const char* buf, size_t len ) = 0;
+   virtual void shutdown() = 0;
 };
 
 
@@ -40,13 +42,15 @@ protected:
 private:
    
    void startChildProc();
-   Socket constructService( sockaddr_in*, socklen_t* );
+   int constructService( sockaddr_in*, socklen_t* );
    void startListening();
    void transfer(const Socket&, const Socket& );
    void alertRecorders( const Socket&, const Socket&, 
                         const char*, size_t len );
    
-   std::list<boost::shared_ptr<Recorder> > recorders_;
+   typedef std::list<boost::shared_ptr<Recorder> > RecCont_t;
+   
+   RecCont_t recorders_;
    std::string serverhost_;
    unsigned int srvPort_;
    Socket Lsock_;

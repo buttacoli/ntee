@@ -3,7 +3,7 @@
 #include "Socket.hpp"
 #include "Settings.hpp"
 #include "comm.hpp"
-#include <algorithm>
+//#include <algorithm>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <cstdio>
 #include <boost/shared_ptr.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 
 
 namespace ntee {
@@ -26,7 +26,7 @@ namespace ntee {
 //!
 //! @param s    The filled in Settings structure to work off of.
 //!
-NTee::NTee( const Settings& s ) : s_(s)
+NTee::NTee( const Settings& s ) : s_(s), Lsock_("L"), Rsock_("R") 
 {
    // empty
 }
@@ -82,9 +82,9 @@ void NTee::startChildProc() {
 //! @returns the socket value upon which to eventually accept upon.
 //!          two more post-conditions of this routine are the setting of the
 //!          NTee instance's serverhost_ and srvPort_ members.
-Socket NTee::constructService( sockaddr_in* psa, socklen_t* plen )
+int NTee::constructService( sockaddr_in* psa, socklen_t* plen )
 {
-   Socket sock;
+   int sock;
    int type = (s_.protocol==Settings::TCP)? SOCK_STREAM : SOCK_DGRAM;   
    SysErrIf( (sock=socket(AF_INET, type, 0 )) == -1 );
 
@@ -162,6 +162,16 @@ void NTee::startListening()
 }   
 
 
+//! @brief Read N , then Write it.
+//!
+//! Reads N bytes of data from the socket and puts the buffer which
+//! had been dynamically allocated during the read function (with 
+//! malloc not new) into a shared_ptr. Scoped_ptr didn't offer the
+//! functionality of specifying a DE-allocator method, and that's 
+//! why I didn't use it here.  If data had been read (eg len>0), then
+//! a Write call is made to the alternate program. If len was returned
+//! as zero, then the from socket is closed.
+//! 
 void NTee::transfer( const Socket& from, const Socket& to )
 {
    char* buf = 0;
@@ -179,13 +189,29 @@ void NTee::transfer( const Socket& from, const Socket& to )
 }
 
 
-
+//! @brief Call each Recorder instance back with data
+//!
+//! This routine loops over the recorders_ container kept by the 
+//! NTee instance, calling the record() method of each Recorder instance
+//! in turn.<br>
+//! <b>NOTES:</b><br><ul>
+//! <li>In the future, I'd like to be able to use boost::bind in a 
+//!     for_each call, but this caused copies of the Socket instances which
+//!     when they terminated, closed the descriptors.
+//! <li>Also in the future, it might be good to put these writes into 
+//!     another thread so they don't block the select loop from fetching
+//!     the next message. NTee should be as transparent as possible to the
+//!     timing of messages between R and L programs.
+//! </ul>
+//! 
 void NTee::alertRecorders(const Socket& from, const Socket& to, 
                           const char* buf, 
                           size_t len)
 {
-   std::for_each( recorders_.begin(), recorders_.end(),
-                  boost::bind(&Recorder::record, _1) );
+   RecCont_t::iterator iter= recorders_.begin();
+   for( ; iter != recorders_.end(); ++iter ) {
+      (*iter)->record(from, to, buf, len);
+   }
 }
 
 
@@ -208,7 +234,8 @@ int NTee::start()
    //** Build up the service port.
    sockaddr_in addr;
    socklen_t len = sizeof(addr);
-   Socket sock = constructService( &addr, &len );
+   Socket sock;
+   sock = constructService( &addr, &len );
    
    //** Not going to accept yet! Instead, we start the client.
    startChildProc();
