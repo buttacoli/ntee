@@ -3,7 +3,7 @@
 #include "Socket.hpp"
 #include "Settings.hpp"
 #include "comm.hpp"
-//#include <algorithm>
+#include <algorithm>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <cstdio>
 #include <boost/shared_ptr.hpp>
-//#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 
 
 namespace ntee {
@@ -269,6 +269,10 @@ int NTee::start()
    
    //** Start listening to both sides and passing the information.
    startListening();
+   
+   //** shut down all recorders
+   std::for_each( recorders_.begin(), recorders_.end(),
+                  boost::bind(&Recorder::shutdown, _1));
    
    return 0;
 }
