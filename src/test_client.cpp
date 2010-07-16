@@ -25,7 +25,7 @@ static int send( int sock, int nb )
 
 static int recv( int sock )
 {
-   uint32_t msg = 0;
+   size_t msg = 0;
    SysErrIf( recv( sock, &msg, sizeof(msg), 0 ) == -1 );
    msg = ntohl(msg); 
    std::cout << "recv: " << msg << "\n";
