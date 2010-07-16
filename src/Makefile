@@ -39,11 +39,11 @@ $(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ -lrt
 
-$(BIN)/testCli: test_client.cpp $(LIB)/ntee.a Error.hpp Socket.hpp
+$(BIN)/testCli: test_client.cpp $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
-$(BIN)/testSrv: test_server.cpp $(LIB)/ntee.a Error.hpp Socket.hpp
+$(BIN)/testSrv: test_server.cpp $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
