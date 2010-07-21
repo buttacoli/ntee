@@ -34,6 +34,7 @@ $(DOXYDIR)/index.html: $(BIN)/testCli $(BIN)/testSrv
 $(LIB)/ntee.a: $(NTEE_OBJ)
 	-$(MKDIR) $(LIB)
 	$(AR) $(ARFLAGS) $@ $^
+	ctags -R .
 
 $(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)

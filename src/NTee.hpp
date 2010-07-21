@@ -52,6 +52,7 @@ private:
    
    RecCont_t recorders_;
    std::string serverhost_;
+   std::string serverip_;
    unsigned int srvPort_;
    Socket Lsock_;
    Socket Rsock_;

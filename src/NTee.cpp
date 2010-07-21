@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
@@ -58,7 +59,9 @@ void NTee::startChildProc() {
       if ( strcmp( *ptr, "@NTEEPORT" ) == 0 )
          snprintf( *ptr, 9,"%d",srvPort_);
       else if ( strcmp( *ptr, "@NTEESERVERADDR" ) == 0 )
-         snprintf( *ptr, 15, serverhost_.c_str());
+         snprintf( *ptr, 15, serverip_.c_str());
+      else if ( strcmp( *ptr, "@NTEESERVERHOSTNAME" ) == 0 )
+         snprintf( *ptr, 19, serverhost_.c_str());
 
       ++ptr;
    }
@@ -104,14 +107,18 @@ int NTee::constructService( sockaddr_in* psa, socklen_t* plen )
    SysErrIf( getsockname(sock, reinterpret_cast<sockaddr*>(psa),
                          plen) == -1 );
 
-   char buf[INET_ADDRSTRLEN];
-   inet_ntop(AF_INET, psa, buf, *plen);
+   //** Save the server port that was assigned and the host address  
+   srvPort_ = ntohs(psa->sin_port);
+
+   char buf[NI_MAXHOST];
+   SysErrIf( gethostname( buf, sizeof(buf)) );
    std::cout << "Server on: " << buf 
              << ":" << ntohs(psa->sin_port) << "\n"; 
-
-   //** Save the server port that was assigned and the host address  
    serverhost_.assign(buf);
-   srvPort_ = ntohs(psa->sin_port);
+      
+   SysErrIf( inet_ntop(AF_INET, psa, buf, *plen) == 0 );
+   serverip_.assign(buf);
+   
 
    
    // magic # 5 is just what most examples use.
@@ -256,16 +263,25 @@ int NTee::start()
 
    // Set up the internet address and port 
    memset(&addr, 0, sizeof(addr));
-   SysErrIf( inet_pton(AF_INET, s_.L_host_ip.c_str(),
-                       reinterpret_cast<sockaddr*>(&addr)) <= 0 );
-   addr.sin_family = AF_INET;
-   addr.sin_port = htons(s_.L_port);
-
-   SysErrIf( connect(Lsock_, reinterpret_cast<sockaddr*>(&addr),
-                     sizeof(addr)) == -1 );
+   struct addrinfo* pAddrInfo;
+   struct addrinfo hints;
+   memset(&hints, 0, sizeof(hints));
+   hints.ai_family = AF_INET;
+   hints.ai_socktype = SOCK_STREAM;
+    
+   int err = 0;
+   SysErrIf( (err=getaddrinfo(s_.L_host_ip.c_str(), s_.L_port.c_str(),
+                              &hints, &pAddrInfo)) != 0 )
+           .info("%s? %d:%s\n",s_.L_host_ip.c_str(),err,gai_strerror(err));
+           
+   SysErrIf( connect(Lsock_, pAddrInfo->ai_addr,
+                     pAddrInfo->ai_addrlen) == -1 );
                        
    std::cout << "NTee connected to L side: " << s_.L_host_ip << ":"
              << s_.L_port << "\n";
+   
+   // free the address info structure alloced by getaddrinfo()
+   freeaddrinfo(pAddrInfo);
    
    //** Start listening to both sides and passing the information.
    startListening();
