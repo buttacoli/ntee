@@ -19,9 +19,23 @@ class Settings;
 //! An interface class which abstracts the behavior of recording data.
 class Recorder {
 public:
+   //! @brief Destructor
    virtual ~Recorder() {}
+   
+   //! Called once for each message transferred by the NTee instance. Durning
+   //! this callback the Recorder implementation should transfer the message
+   //! data to its target.
+   //! @param from   Message data is coming from this Socket.
+   //! @param to     Message data is going to be sent to this Socket.
+   //! @param buf    The message buffer itself.
+   //! @param len    Size of the message buffer.
+   //!
    virtual void record( const Socket& from, const Socket& to, 
                         const char* buf, size_t len ) = 0;
+   
+   //! Called when all the sockets have closed and there is no more information
+   //! to be recorded.  This allows the Record implementation the opportunity
+   //! to gracefully shut itself down, and return any resources.
    virtual void shutdown() = 0;
 };
 
@@ -37,7 +51,7 @@ public:
    void addRecorder( const boost::shared_ptr<Recorder>& );
 
 protected:
-   const Settings& s_;
+   const Settings& s_;   //< The information from command line args
    
 private:
    
@@ -47,6 +61,7 @@ private:
    void transfer(const Socket&, const Socket& );
    void alertRecorders( const Socket&, const Socket&, 
                         const char*, size_t len );
+   void childExited( int );
    
    typedef std::list<boost::shared_ptr<Recorder> > RecCont_t;
    

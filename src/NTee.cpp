@@ -2,11 +2,14 @@
 #include "Error.hpp"
 #include "Socket.hpp"
 #include "Settings.hpp"
+#include "UnixSignalHub.hpp"
 #include "comm.hpp"
+#include <errno.h>
 #include <algorithm>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -40,6 +43,33 @@ NTee::~NTee()
 }
 
 
+//! @brief  Waits on child termination to collect its process status.
+//!
+//! This routine is called when a SIGCHLD signal is recieved from the kernel.
+//! It mearly waits() for the child process, and reports its termination 
+//! status to the stdout.
+//!
+//! @param sig   Signal number recieved, should always be SIGCHLD only.
+//!
+void NTee::childExited( int sig )
+{
+   int status;
+   pid_t pid = wait(&status);
+   
+   int exitWith = WEXITSTATUS(status);
+   std::cout << "R client: " << pid << " has exited: " << exitWith << "\n";
+   
+   // We can't shutdown the Lsock_ socket, even though we know that the R
+   // side won't be communicating anymore, because there still could be stuff
+   // left on the R socket to read... and send.  But it should be returning
+   // EOF real soon.
+   
+   // returns control to where we were.  If we are in a read, it will have
+   // to handle EINTR errno.
+}
+
+   
+
 //! @brief Starts the child R side process.
 //!
 //! Forks and execs the R side process. The parent process, before it forks
@@ -58,8 +88,8 @@ void NTee::startChildProc() {
    while( *ptr ) {
       if ( strcmp( *ptr, "@NTEEPORT" ) == 0 )
          snprintf( *ptr, 9,"%d",srvPort_);
-      else if ( strcmp( *ptr, "@NTEESERVERADDR" ) == 0 )
-         snprintf( *ptr, 15, serverip_.c_str());
+      else if ( strcmp( *ptr, "@NTEESERVERHOSTADDR" ) == 0 )
+         snprintf( *ptr, 19, serverip_.c_str());
       else if ( strcmp( *ptr, "@NTEESERVERHOSTNAME" ) == 0 )
          snprintf( *ptr, 19, serverhost_.c_str());
 
@@ -73,6 +103,10 @@ void NTee::startChildProc() {
       SysErrIf( execvp( s_.R_cmd[0], s_.R_cmd ) == -1 );
    }
    SysErrIf( pid == -1 ).info("Unable to fork properly\n");
+   
+   //** trap the SIGCHLD which will be queued to us if the client dies and
+   //** cause the program to collect the child process with wait.
+   UnixSignalHub::trap(SIGCHLD, boost::bind( &NTee::childExited, this, _1 ));
 }
 
 
@@ -152,8 +186,10 @@ void NTee::startListening()
    std::cout << "Polling\n";
    char buf[1024];
    
+   try_again:
    while( (rc=select(max+1, &rd_fds, 0, 0, 0)) > 0 ) {
       std::cout << "Select returned: " << rc << "\n";
+         
       if ( FD_ISSET( Lsock_, &rd_fds ) )
          transfer(Lsock_,Rsock_);
          
@@ -164,6 +200,11 @@ void NTee::startListening()
       FD_SET(Lsock_, &rd_fds);
       FD_SET(Rsock_, &rd_fds);
       
+   }
+   if ( rc == -1 && errno == EINTR ) {
+      goto try_again;    // SIGCHLD came in, but there could be still some
+                         // data left to read. Goto's are bad form, but here
+                         // we get a lot less code for using it.
    }
    
 }   

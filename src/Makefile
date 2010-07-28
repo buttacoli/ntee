@@ -15,7 +15,8 @@ NTEE_SOURCE := ntee_main.cpp \
                NTee.cpp \
                FileRecorder.cpp \
                Socket.cpp \
-               comm.cpp
+               comm.cpp \
+               UnixSignalHub.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
 NTEE_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(NTEE_SOURCE)))
