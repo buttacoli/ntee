@@ -51,7 +51,7 @@ public:
    void addRecorder( const boost::shared_ptr<Recorder>& );
 
 protected:
-   const Settings& s_;   //< The information from command line args
+   const Settings& s_;   //!< The information from command line args
    
 private:
    
