@@ -42,7 +42,7 @@
 <a name="l00029"></a><a class="code" href="structntee_1_1_settings.html#a2d7c1cba5f83e3354b668b3304f30a00">00029</a>    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="structntee_1_1_settings.html#a2d7c1cba5f83e3354b668b3304f30a00" title="port to start on (0 means wildcard!)">srv_port</a>;            
 <a name="l00030"></a><a class="code" href="structntee_1_1_settings.html#a3302716eaae792cf5977461c8759e275">00030</a>    std::string <a class="code" href="structntee_1_1_settings.html#a3302716eaae792cf5977461c8759e275" title="output file path name">output_filename</a>;        
 <a name="l00031"></a><a class="code" href="structntee_1_1_settings.html#a0c96ee9be4f1eae5833f12449428999e">00031</a>    std::string <a class="code" href="structntee_1_1_settings.html#a0c96ee9be4f1eae5833f12449428999e" title="IP address of the L program.">L_host_ip</a>;              
-<a name="l00032"></a><a class="code" href="structntee_1_1_settings.html#a55954dbdad9bd3c13677e94618388a16">00032</a>    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> <a class="code" href="structntee_1_1_settings.html#a55954dbdad9bd3c13677e94618388a16" title="Port at which L is listening.">L_port</a>;              
+<a name="l00032"></a><a class="code" href="structntee_1_1_settings.html#a2562ef60f1181a9f4d737d3db29ce309">00032</a>    std::string <a class="code" href="structntee_1_1_settings.html#a2562ef60f1181a9f4d737d3db29ce309" title="Port at which L is listening.">L_port</a>;                 
 <a name="l00033"></a><a class="code" href="structntee_1_1_settings.html#abb2c393223cbd8468007dc23744b469b">00033</a>    <span class="keywordtype">char</span>** <a class="code" href="structntee_1_1_settings.html#abb2c393223cbd8468007dc23744b469b" title="Command line args to start R with.">R_cmd</a>;                       
 <a name="l00034"></a>00034 
 <a name="l00035"></a>00035    
@@ -50,7 +50,7 @@
 <a name="l00041"></a>00041                 <a class="code" href="structntee_1_1_settings.html#a2d7c1cba5f83e3354b668b3304f30a00" title="port to start on (0 means wildcard!)">srv_port</a>(WILDCARD_PORT),
 <a name="l00042"></a>00042                 <a class="code" href="structntee_1_1_settings.html#a3302716eaae792cf5977461c8759e275" title="output file path name">output_filename</a>(DEFAULT_OUTPUT),
 <a name="l00043"></a>00043                 <a class="code" href="structntee_1_1_settings.html#a0c96ee9be4f1eae5833f12449428999e" title="IP address of the L program.">L_host_ip</a>(<span class="stringliteral">&quot;&quot;</span>),
-<a name="l00044"></a>00044                 <a class="code" href="structntee_1_1_settings.html#a55954dbdad9bd3c13677e94618388a16" title="Port at which L is listening.">L_port</a>(0)
+<a name="l00044"></a>00044                 <a class="code" href="structntee_1_1_settings.html#a2562ef60f1181a9f4d737d3db29ce309" title="Port at which L is listening.">L_port</a>(<span class="stringliteral">&quot;&quot;</span>)
 <a name="l00045"></a>00045    {  <span class="comment">/* empty */</span> }
 <a name="l00046"></a>00046 };
 <a name="l00047"></a>00047 
@@ -60,7 +60,7 @@
 <a name="l00051"></a>00051 <span class="preprocessor">#endif</span>
 <a name="l00052"></a>00052 <span class="preprocessor"></span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 27 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

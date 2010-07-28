@@ -36,7 +36,7 @@
 <a name="l00013"></a>00013 <span class="preprocessor">#include &quot;Error.hpp&quot;</span>
 <a name="l00014"></a>00014 <span class="preprocessor">#include &quot;Socket.hpp&quot;</span>
 <a name="l00015"></a>00015 
-<a name="l00016"></a>00016 <span class="keyword">static</span> <span class="keywordtype">void</span> handleClient(<a class="code" href="struct_socket.html">Socket</a>&amp;);
+<a name="l00016"></a>00016 <span class="keyword">static</span> <span class="keywordtype">void</span> handleClient(<a class="code" href="class_socket.html">Socket</a>&amp;);
 <a name="l00017"></a>00017 
 <a name="l00022"></a>00022 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv)
 <a name="l00023"></a>00023 {
@@ -59,14 +59,14 @@
 <a name="l00040"></a>00040       
 <a name="l00041"></a>00041    
 <a name="l00042"></a>00042    <span class="comment">//** Get the server to accept stage</span>
-<a name="l00043"></a>00043    <a class="code" href="struct_socket.html">Socket</a> sock;
+<a name="l00043"></a>00043    <a class="code" href="class_socket.html">Socket</a> sock;
 <a name="l00044"></a>00044    SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
 <a name="l00045"></a>00045    SysErrIf( bind(sock, reinterpret_cast&lt;sockaddr*&gt;(&amp;addr), <span class="keyword">sizeof</span>(addr)) == -1 );
 <a name="l00046"></a>00046    SysErrIf( listen(sock, 5) == -1 );
 <a name="l00047"></a>00047    
 <a name="l00048"></a>00048    <span class="comment">//** Forever accept new connections and reply</span>
 <a name="l00049"></a>00049    <span class="keywordflow">for</span>( ;; ) {
-<a name="l00050"></a>00050      <a class="code" href="struct_socket.html">Socket</a> cliSock;
+<a name="l00050"></a>00050      <a class="code" href="class_socket.html">Socket</a> cliSock;
 <a name="l00051"></a>00051      memset( &amp;addr, 0, <span class="keyword">sizeof</span>(addr) );
 <a name="l00052"></a>00052      socklen_t len = <span class="keyword">sizeof</span>(addr);
 <a name="l00053"></a>00053      SysErrIf( (cliSock=accept(sock,reinterpret_cast&lt;sockaddr*&gt;(&amp;addr),&amp;len)) == -1 );
@@ -84,7 +84,7 @@
 <a name="l00065"></a>00065 }
 <a name="l00066"></a>00066 
 <a name="l00067"></a>00067 
-<a name="l00074"></a>00074 <span class="keywordtype">void</span> handleClient( <a class="code" href="struct_socket.html">Socket</a>&amp; cliSock ) {
+<a name="l00074"></a>00074 <span class="keywordtype">void</span> handleClient( <a class="code" href="class_socket.html">Socket</a>&amp; cliSock ) {
 <a name="l00075"></a>00075 
 <a name="l00076"></a>00076    <span class="keywordtype">size_t</span> rnb, total;
 <a name="l00077"></a>00077    <span class="keyword">static</span> <span class="keywordtype">char</span> buf[1020];  <span class="comment">// Hack! This is not 1024, just so when the client sends</span>
@@ -106,7 +106,7 @@
 <a name="l00093"></a>00093    } 
 <a name="l00094"></a>00094 }
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 27 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

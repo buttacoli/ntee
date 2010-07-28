@@ -27,30 +27,42 @@
 <a name="l00004"></a>00004 <span class="preprocessor">#include &lt;unistd.h&gt;</span>
 <a name="l00005"></a>00005 <span class="preprocessor">#include &lt;iostream&gt;</span>
 <a name="l00006"></a>00006 
-<a name="l00012"></a><a class="code" href="struct_socket.html">00012</a> <span class="keyword">struct </span><a class="code" href="struct_socket.html">Socket</a> {
-<a name="l00013"></a>00013    
-<a name="l00014"></a><a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70">00014</a>    <span class="keywordtype">int</span> <a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a>;   
+<a name="l00012"></a><a class="code" href="class_socket.html">00012</a> <span class="keyword">class </span><a class="code" href="class_socket.html">Socket</a> {
+<a name="l00013"></a>00013 <span class="keyword">public</span>:
+<a name="l00014"></a>00014 
 <a name="l00015"></a>00015    
-<a name="l00017"></a><a class="code" href="struct_socket.html#a7c3256c4fc6e2c603df73201049fae5a">00017</a>    <a class="code" href="struct_socket.html#a7c3256c4fc6e2c603df73201049fae5a" title="Constructor.">Socket</a>() : <a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a>(0) {}
-<a name="l00018"></a>00018    
-<a name="l00021"></a><a class="code" href="struct_socket.html#aeac4eb6379a543d38ed88977d3b6630a">00021</a>    <a class="code" href="struct_socket.html#aeac4eb6379a543d38ed88977d3b6630a">~Socket</a>() { 
-<a name="l00022"></a>00022       std::cerr &lt;&lt; <span class="stringliteral">&quot;close(&quot;</span> &lt;&lt; <a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a> &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;
-<a name="l00023"></a>00023       close(fd_); 
-<a name="l00024"></a>00024    }
-<a name="l00025"></a>00025    
-<a name="l00030"></a><a class="code" href="struct_socket.html#af61fbb637a05cd379692de511be8dcac">00030</a>    <a class="code" href="struct_socket.html">Socket</a>&amp; <a class="code" href="struct_socket.html#af61fbb637a05cd379692de511be8dcac">operator=</a>( <span class="keywordtype">int</span> v ) { <a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a> = v; <span class="keywordflow">return</span> *<span class="keyword">this</span>; }
-<a name="l00031"></a>00031    
-<a name="l00035"></a><a class="code" href="struct_socket.html#abce93a2ae4cbc8acd7a39795eaf41bcc">00035</a>    <a class="code" href="struct_socket.html#abce93a2ae4cbc8acd7a39795eaf41bcc">operator int</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a>; }
-<a name="l00036"></a>00036 };   
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 
-<a name="l00050"></a>00050 <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">bool</span> operator==( <span class="keyword">const</span> <a class="code" href="struct_socket.html">Socket</a>&amp; s, <span class="keyword">const</span> T&amp; v ) {
-<a name="l00051"></a>00051   <span class="keywordflow">return</span> s.<a class="code" href="struct_socket.html#a226d5aa7dfb572eed47ed8e003d58e70" title="The descriptor.">fd_</a> == v;
-<a name="l00052"></a>00052 }
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054 <span class="preprocessor">#endif</span>
+<a name="l00017"></a><a class="code" href="class_socket.html#a7c3256c4fc6e2c603df73201049fae5a">00017</a>    <a class="code" href="class_socket.html#a7c3256c4fc6e2c603df73201049fae5a" title="Constructor.">Socket</a>() : fd_(-1) {}
+<a name="l00018"></a>00018    <a class="code" href="class_socket.html#a7c3256c4fc6e2c603df73201049fae5a" title="Constructor.">Socket</a>(<span class="keyword">const</span> std::string&amp; <a class="code" href="class_socket.html#a6b9dbf98b848edef8e8e4f8cd5c57960" title="Return the name of the Socket.">name</a>) : fd_(-1), name_(name) {}
+<a name="l00019"></a>00019    
+<a name="l00022"></a><a class="code" href="class_socket.html#aeac4eb6379a543d38ed88977d3b6630a">00022</a>    <a class="code" href="class_socket.html#aeac4eb6379a543d38ed88977d3b6630a">~Socket</a>() { 
+<a name="l00023"></a>00023       std::cerr &lt;&lt; <span class="stringliteral">&quot;close(&quot;</span> &lt;&lt; fd_ &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;
+<a name="l00024"></a>00024       <span class="keywordflow">if</span> ( fd_ &gt; -1 ) close(fd_); 
+<a name="l00025"></a>00025    }
+<a name="l00026"></a>00026    
+<a name="l00031"></a><a class="code" href="class_socket.html#af61fbb637a05cd379692de511be8dcac">00031</a>    <a class="code" href="class_socket.html">Socket</a>&amp; <a class="code" href="class_socket.html#af61fbb637a05cd379692de511be8dcac">operator=</a>( <span class="keywordtype">int</span> v ) { fd_ = v; <span class="keywordflow">return</span> *<span class="keyword">this</span>; }
+<a name="l00032"></a>00032    
+<a name="l00036"></a><a class="code" href="class_socket.html#abce93a2ae4cbc8acd7a39795eaf41bcc">00036</a>    <a class="code" href="class_socket.html#abce93a2ae4cbc8acd7a39795eaf41bcc">operator int</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> fd_; }
+<a name="l00037"></a>00037    
+<a name="l00039"></a>00039    std::string <a class="code" href="class_socket.html#a6b9dbf98b848edef8e8e4f8cd5c57960" title="Return the name of the Socket.">name</a>() <span class="keyword">const</span>;
+<a name="l00040"></a>00040    <span class="keywordtype">int</span> getDescriptor()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> fd_; }
+<a name="l00041"></a>00041    
+<a name="l00042"></a>00042 <span class="keyword">private</span>:
+<a name="l00043"></a>00043    <span class="comment">// Unassignable and uncopyable?</span>
+<a name="l00044"></a>00044    <a class="code" href="class_socket.html#a7c3256c4fc6e2c603df73201049fae5a" title="Constructor.">Socket</a>( <span class="keyword">const</span> <a class="code" href="class_socket.html">Socket</a>&amp; );
+<a name="l00045"></a>00045    <a class="code" href="class_socket.html">Socket</a>&amp; <a class="code" href="class_socket.html#af61fbb637a05cd379692de511be8dcac">operator=</a>( <span class="keyword">const</span> <a class="code" href="class_socket.html">Socket</a>&amp; );
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047    <span class="keywordtype">int</span> fd_;            
+<a name="l00048"></a>00048    std::string name_;  
+<a name="l00049"></a>00049 };   
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051 
+<a name="l00063"></a>00063 <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">bool</span> operator==( <span class="keyword">const</span> <a class="code" href="class_socket.html">Socket</a>&amp; s, <span class="keyword">const</span> T&amp; v ) {
+<a name="l00064"></a>00064   <span class="keywordflow">return</span> s.getDescriptor() == v;
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 27 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

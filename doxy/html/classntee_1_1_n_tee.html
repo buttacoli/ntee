@@ -37,7 +37,7 @@ Collaboration diagram for ntee::NTee:</div>
 <div class="dynsection">
 <div class="center"><img src="classntee_1_1_n_tee__coll__graph.png" border="0" usemap="#ntee_1_1_n_tee_coll__map" alt="Collaboration graph"/></div>
 <map name="ntee_1_1_n_tee_coll__map" id="ntee_1_1_n_tee_coll__map">
-<area shape="rect" href="struct_socket.html" title="Socket" alt="" coords="5,7,72,33"/><area shape="rect" href="structntee_1_1_settings.html" title="Structure to hold ntee configuration." alt="" coords="96,7,216,33"/></map>
+<area shape="rect" href="class_socket.html" title="Socket" alt="" coords="5,7,72,33"/><area shape="rect" href="structntee_1_1_settings.html" title="Structure to hold ntee configuration." alt="" coords="96,7,216,33"/></map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="classntee_1_1_n_tee-members.html">List of all members.</a></p>
@@ -53,12 +53,13 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds a data recorder to the <a class="el" href="classntee_1_1_n_tee.html" title="This is the main class of the project.">NTee</a> list.  <a href="#abe21e4398d057ae802e0a828a0b08f66"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1c344cf041e5fc6d4045c009028213e"></a><!-- doxytag: member="ntee::NTee::s_" ref="ad1c344cf041e5fc6d4045c009028213e" args="" -->
-const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>s_</b></td></tr>
+const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_n_tee.html#ad1c344cf041e5fc6d4045c009028213e">s_</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The information from command line args. <br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>This is the main class of the project. </p>
 
-<p>Definition at line <a class="el" href="_n_tee_8hpp_source.html#l00028">28</a> of file <a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>.</p>
+<p>Definition at line <a class="el" href="_n_tee_8hpp_source.html#l00044">44</a> of file <a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a93f4842c1cb091bf81a7337c2622e9b4"></a><!-- doxytag: member="ntee::NTee::NTee" ref="a93f4842c1cb091bf81a7337c2622e9b4" args="(const Settings &amp;s)" -->
 <div class="memitem">
@@ -84,7 +85,7 @@ const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00029">29</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00033">33</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
 
 </div>
 </div>
@@ -114,7 +115,7 @@ const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00260">260</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00348">348</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
 
 </div>
 </div>
@@ -137,7 +138,7 @@ const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;
 <p>This is the primary interface which clients call to start the ntee middle man service. First step, listen for the R side client. Next step, connect with the L side service. From this point forward the two processes are now in communication through ntee, this routine falls into an infinite select loop on both the R side and L side connection points.</p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>status of the commands. In reality though, the program exits when it first goes wrong, which is really not a good thing because this is supposed to be a LIBRARY routine. TODO: fix this problem. </dd></dl>
 
-<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00206">206</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
+<p>Definition at line <a class="el" href="_n_tee_8cpp_source.html#l00280">280</a> of file <a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a>.</p>
 
 </div>
 </div>
@@ -146,7 +147,7 @@ const <a class="el" href="structntee_1_1_settings.html">Settings</a> &amp;&nbsp;
 <li>/home/mbuttaco/ntee/src/<a class="el" href="_n_tee_8cpp_source.html">NTee.cpp</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 27 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

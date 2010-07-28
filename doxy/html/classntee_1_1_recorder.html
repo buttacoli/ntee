@@ -38,18 +38,93 @@
 <p><a href="classntee_1_1_recorder-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1151d3c8ed66d9c061778130880c82f"></a><!-- doxytag: member="ntee::Recorder::record" ref="af1151d3c8ed66d9c061778130880c82f" args="()=0" -->
-virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>record</b> ()=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a984f34e1ae45d63fc688385b2dcc8294"></a><!-- doxytag: member="ntee::Recorder::~Recorder" ref="a984f34e1ae45d63fc688385b2dcc8294" args="()" -->
+virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_recorder.html#a984f34e1ae45d63fc688385b2dcc8294">~Recorder</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_recorder.html#a4e5800d5067efdcffefcc99271e3a4db">record</a> (const <a class="el" href="class_socket.html">Socket</a> &amp;from, const <a class="el" href="class_socket.html">Socket</a> &amp;to, const char *buf, size_t len)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classntee_1_1_recorder.html#a6bf90786a18104b3033638b315bf1980">shutdown</a> ()=0</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>An interface class which abstracts the behavior of recording data. </p>
 
 <p>Definition at line <a class="el" href="_n_tee_8hpp_source.html#l00020">20</a> of file <a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a>.</p>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a4e5800d5067efdcffefcc99271e3a4db"></a><!-- doxytag: member="ntee::Recorder::record" ref="a4e5800d5067efdcffefcc99271e3a4db" args="(const Socket &amp;from, const Socket &amp;to, const char *buf, size_t len)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void ntee::Recorder::record </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_socket.html">Socket</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_socket.html">Socket</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>to</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&nbsp;</td>
+          <td class="paramname"> <em>len</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Called once for each message transferred by the <a class="el" href="classntee_1_1_n_tee.html" title="This is the main class of the project.">NTee</a> instance. Durning this callback the <a class="el" href="classntee_1_1_recorder.html" title="An interface class which abstracts the behavior of recording data.">Recorder</a> implementation should transfer the message data to its target. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>from</em>&nbsp;</td><td>Message data is coming from this <a class="el" href="class_socket.html">Socket</a>. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>to</em>&nbsp;</td><td>Message data is going to be sent to this <a class="el" href="class_socket.html">Socket</a>. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>buf</em>&nbsp;</td><td>The message buffer itself. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>len</em>&nbsp;</td><td>Size of the message buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classntee_1_1_file_recorder.html#ab61278b2ea123a5ba0bd6753c75720a1">ntee::FileRecorder</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6bf90786a18104b3033638b315bf1980"></a><!-- doxytag: member="ntee::Recorder::shutdown" ref="a6bf90786a18104b3033638b315bf1980" args="()=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void ntee::Recorder::shutdown </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Called when all the sockets have closed and there is no more information to be recorded. This allows the Record implementation the opportunity to gracefully shut itself down, and return any resources. </p>
+
+<p>Implemented in <a class="el" href="classntee_1_1_file_recorder.html#ae7e07c413d7d4f2f2486e95a202ea661">ntee::FileRecorder</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/mbuttaco/ntee/src/<a class="el" href="_n_tee_8hpp_source.html">NTee.hpp</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 14 Jul 2010 for ntee by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 27 Jul 2010 for ntee by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
