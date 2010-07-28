@@ -73,9 +73,7 @@ Settings Arguments::parse( int argc, char** argv )
       }
       else if ( ! strcmp(argv[i],"-L") && i+2 <= last_arg_index ) {
          s.L_host_ip.assign(argv[++i]);
-         ErrIfCatch(boost::bad_lexical_cast,
-                    s.L_port=boost::lexical_cast<unsigned short>(argv[++i]))
-                 .info("Bad L-port number\n");
+         s.L_port.assign(argv[++i]);
       }
       else if ( ! strcmp(argv[i],"-R") && i+1 <= last_arg_index ) {
          ++i;  // skip the -R 

@@ -9,18 +9,19 @@
 //! so the destructor can be used to close the descriptor when the Socket 
 //! goes out of scope.  We can then not have to worry about closing the Socket
 //! if error's occur, it will do it by itself.
-struct Socket {
-   
-   int fd_;   //!< The descriptor
+class Socket {
+public:
+
    
    //! Constructor
-   Socket() : fd_(0) {}
+   Socket() : fd_(-1) {}
+   Socket(const std::string& name) : fd_(-1), name_(name) {}
    
    //! All important destructor.  This calls the close() function when the Socket
    //! goes out of scope, so we can use instances as automatic variables.
    ~Socket() { 
       std::cerr << "close(" << fd_ << ")\n";
-      close(fd_); 
+      if ( fd_ > -1 ) close(fd_); 
    }
    
    //! Assignment from integer.  This allows the Socket to be initialized directly
@@ -33,6 +34,18 @@ struct Socket {
    //! used in a situation where the integer would be expected (bind, listen, etc.)
    //! This just makes the code look more natural.
    operator int() const { return fd_; }
+   
+   //! Return the name of the Socket
+   std::string name() const;
+   int getDescriptor() const { return fd_; }
+   
+private:
+   // Unassignable and uncopyable?
+   Socket( const Socket& );
+   Socket& operator=( const Socket& );
+
+   int fd_;            //!< The descriptor  
+   std::string name_;  //!< an Identity
 };   
 
 
@@ -48,7 +61,7 @@ struct Socket {
 //! @returns true if v == s.fd_ as an integer comparison. false otherwise.
 //!
 template <typename T> bool operator==( const Socket& s, const T& v ) {
-  return s.fd_ == v;
+  return s.getDescriptor() == v;
 }
 
 #endif

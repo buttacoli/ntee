@@ -29,7 +29,7 @@ struct Settings {
    unsigned short srv_port;            //!< port to start on (0 means wildcard!)
    std::string output_filename;        //!< output file path name
    std::string L_host_ip;              //!< IP address of the L program
-   unsigned short L_port;              //!< Port at which L is listening
+   std::string L_port;                 //!< Port at which L is listening
    char** R_cmd;                       //!< Command line args to start R with
 
    
@@ -41,7 +41,7 @@ struct Settings {
                 srv_port(WILDCARD_PORT),
                 output_filename(DEFAULT_OUTPUT),
                 L_host_ip(""),
-                L_port(0)
+                L_port("")
    {  /* empty */ }
 };
 
