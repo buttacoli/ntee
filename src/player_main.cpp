@@ -2,7 +2,6 @@
 #include "Error.hpp"
 #include <iostream>
 #include <string>
-#include <boost/lexical_cast.hpp>
 #include <cstring>
 
 //! @mainpage  Player
@@ -45,7 +44,7 @@ int main(int argc, char** argv)
    Player::Config pc;
    if ( ! strcmp(argv[1],"-h") || ! strcmp(argv[1],"--help") ) {
       std::cerr << USAGE << HELP;
-      std::exit(0);
+      return(0);
    }
    else if ( strcmp(argv[1],"--client") == 0 ) 
       pc.type = Player::Config::CLIENT;
@@ -61,8 +60,7 @@ int main(int argc, char** argv)
 
    // Grab the other args    
    pc.host = argv[2];
-   ErrIfCatch( boost::bad_lexical_cast, 
-               pc.port = boost::lexical_cast<int>( argv[3] ) );
+   pc.port = argv[3];
    pc.file = argv[4];
 
    // Create and configure the player

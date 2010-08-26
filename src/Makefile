@@ -7,6 +7,7 @@ DOXYGEN := doxygen
 MKDIR := mkdir -p
 
 CXXFLAGS := -ggdb
+LDLIBS := -lrt
 
 NTEE_SOURCE := ntee_main.cpp \
                Arguments.cpp \
@@ -14,8 +15,12 @@ NTEE_SOURCE := ntee_main.cpp \
                Error.cpp \
                NTee.cpp \
                FileRecorder.cpp \
+               Buffer.cpp \
+               IPAddress.cpp \
                Socket.cpp \
+               TCPSocket.cpp \
                comm.cpp \
+               BinaryDataFile.cpp \
                UnixSignalHub.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
@@ -44,7 +49,7 @@ $(LIB)/ntee.a: $(NTEE_OBJ)
 
 $(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ -lrt
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 $(BIN)/testCli: test_client.cpp $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
@@ -56,7 +61,7 @@ $(BIN)/testSrv: test_server.cpp $(LIB)/ntee.a
 
 $(BIN)/ntee_player: $(PLAYER_OBJ) $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ 
 
 clean:
 	-rm $(NTEE_OBJ) $(NTEE_DEPS) $(LIB)/ntee.a $(BIN)/{ntee,testCli,testSrv}

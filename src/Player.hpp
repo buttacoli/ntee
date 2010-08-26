@@ -3,6 +3,11 @@
 
 #include <string>
 
+namespace ntee {
+   class Socket2;
+   class BinaryDataFile;
+}
+
 //! The Player class reads ntee output files and pushes data out
 //! over a socket.  Acting like the server.
 //!
@@ -14,7 +19,7 @@ public:
    struct Config {
       enum { CLIENT, SERVER } type;
       std::string host;
-      int port;
+      std::string port;
       std::string file;
    };
 
@@ -25,6 +30,10 @@ public:
    int start();
 
 private:
+
+   int playback( ntee::Socket2*, ntee::BinaryDataFile& );
+   ntee::Socket2* connect();
+   
    Config cfg_;
          
 };
