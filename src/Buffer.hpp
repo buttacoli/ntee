@@ -19,8 +19,8 @@ enum TransferType {
 //! dynamically allocated.
 struct Buffer {
    
-   Buffer();
-   Buffer(const TransferType& tt);
+   Buffer(bool dyn=true);
+   Buffer(const TransferType& tt, bool dyn=true);
    ~Buffer();
    void setTime();
    
@@ -29,7 +29,7 @@ struct Buffer {
    timespec ts;
    
    const char* buf;
-   
+   bool dyn_;
 };
 
 

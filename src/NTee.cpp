@@ -124,9 +124,13 @@ void NTee::startChildProc() {
 Socket* NTee::constructService( )
 {
    Socket* svc = new TCPSocket("Service");
-   std::string sport = boost::lexical_cast<std::string>(s_.srv_port);
-   IPAddress ipaddr( "127.0.0.1", sport.c_str() );   
+   serverhost_ = "localhost";
+   serverip_ = "127.0.0.1";
+   srvPort_ = s_.srv_port;
+   IPAddress ipaddr( serverhost_.c_str(), srvPort_ );   
    svc->listenOn(ipaddr);
+std::cerr << "Ntee service listening on: " << ipaddr.getPort() << "\n";
+   srvPort_ = ipaddr.getPort();
    return svc;
 }
    

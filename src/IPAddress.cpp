@@ -15,12 +15,11 @@ IPAddress::IPAddress(const char* host, const char* port)
    compute();
 }
 
-IPAddress::IPAddress( const sockaddr_in& addr )
+#include <iostream>
+IPAddress::IPAddress(const char* host, int port )
+ : pAI_(0), hostname_(host)
 {
-   char buf[INET_ADDRSTRLEN];
-   inet_ntop(AF_INET, (sockaddr*) &addr, buf, sizeof(addr));
-   hostname_ = std::string(buf);
-   port_ = boost::lexical_cast<std::string>(addr.sin_port);
+   port_ = boost::lexical_cast<std::string>(port);
    compute();
 }
  
@@ -54,6 +53,12 @@ sockaddr* IPAddress::getAddr()
    return ( pAI_ )?pAI_->ai_addr:0;
 }
 
+int IPAddress::getPort()
+{
+   int port = ( pAI_ )?((sockaddr_in*)pAI_->ai_addr)->sin_port:0;
+   port = htons(port);
+   return port;
+}
 
 void IPAddress::compute()
 { 

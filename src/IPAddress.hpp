@@ -12,11 +12,12 @@ class IPAddress : public Address {
 public:
 
    IPAddress(const char* host, const char* port);
-   IPAddress( const sockaddr_in& );
+   IPAddress(const char* host, int port );
    ~IPAddress();
    
    sockaddr* getAddr();
    int getLen();
+   int getPort();
    
    IPAddress* clone() const;
    

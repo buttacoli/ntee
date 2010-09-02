@@ -32,18 +32,9 @@ int main(int argc, char** argv)
    ErrIfCatch(boost::bad_lexical_cast,
               port = boost::lexical_cast<in_port_t>( argv[1] ))
              .info("%s is not a port number!\n",argv[1]);
-   
-   // Put the supplied ip addr into the sockaddr_in struct, we will reuse this
-   // memory later to store client addresses in it as they connect.
-   sockaddr_in addr;
-   memset( &addr, 0, sizeof(addr) );
-   addr.sin_family = AF_INET;
-   addr.sin_addr.s_addr = htonl(INADDR_ANY);  // Wildcard address kernel picks best bind     
-   addr.sin_port = htons(port);
       
-   
    //** Get the server to accept stage
-   IPAddress ip(addr);
+   IPAddress ip("localhost", port);
    Socket* sock = new TCPSocket("Svc");
    sock->listenOn(ip);
 
@@ -51,13 +42,7 @@ int main(int argc, char** argv)
    //** Forever accept new connections and reply
    for( ;; ) {
      Socket* cliSock = sock->accept("Client");
-     std::cout << "Connection made\n";
-     
-//     char cliName[INET_ADDRSTRLEN];
-//     WarnIf( inet_ntop(AF_INET, &addr, cliName, sizeof(cliName) ) == 0 );
-//     std::cout << "CONNECTED to: " << ((cliName)?cliName:"Unknown") 
-//               << ":" << addr.sin_port << "\n";
-     
+     std::cout << "Connection made: fd = " << cliSock->getFD() << "\n";     
      handleClient( *cliSock );
      delete cliSock;
    }
@@ -76,24 +61,19 @@ int main(int argc, char** argv)
 void handleClient( Socket& cliSock ) {
 
    Buffer* pB;
-   size_t rnb, total;
+   size_t total;
 
-   while( 1 ) {
-      total = 0;
-      while ( (pB=cliSock.recv()) != 0 ) {
-         rnb = pB->len;
-         total += rnb;
-         delete pB;
-      }
-      total += rnb;
-      if ( total == 0 ) return;
+   while( (pB=cliSock.recv()) != 0 ) {
+      total = pB->len;
+      delete pB;
       
       std::cout << "    RECIEVED " << total << " bytes\n"; 
 
       size_t snb = htonl(total);
-      Buffer b;
+      Buffer b(false);    // NOT dynamic memory.
       b.buf = (const char*) &snb;
       b.len = sizeof(snb);
-      WarnIf( (snb=cliSock.send(b)) == -1 );
-   } 
+      WarnIf( (snb=cliSock.send(b)) < b.len );
+   }
+   std::cout << "Client DISCONNECTED\n"; 
 }

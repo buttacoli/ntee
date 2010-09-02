@@ -61,14 +61,6 @@ int main(int argc, char** argv)
               port = boost::lexical_cast<in_port_t>( argv[2] ))
              .info("%s is not a port number!\n",argv[2]);
    
-   // Put the supplied ip addr into the sockaddr_in struct
-   sockaddr_in svAddr;
-   memset( &svAddr, 0, sizeof(svAddr) );
-   ErrIf( inet_pton(AF_INET, serverIP.c_str(), &svAddr ) != 1 )
-        .info("Unable to convert '%s' to an AF_INET address\n",serverIP.c_str());
-   
-   svAddr.sin_family = AF_INET;     
-   svAddr.sin_port = htons(port);
    
    // Get the last (optional) argument which is the number of times to send to the
    // server. Default to 10.
@@ -83,7 +75,7 @@ int main(int argc, char** argv)
    
    //** Connect to the server
    Socket* sock = new TCPSocket("Cli");
-   IPAddress ipaddr( svAddr );
+   IPAddress ipaddr( serverIP.c_str(), port );
    SysErrIf( sock->connectTo(ipaddr) == -1 );
    
    //** Send maxPing messages to the server, each progressively longer then the last

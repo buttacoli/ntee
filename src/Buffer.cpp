@@ -2,14 +2,15 @@
 
 namespace ntee {
 
-Buffer::Buffer()
+Buffer::Buffer(bool dyn)
+ : len(0), buf(0), dyn_(dyn)
 {
-   // empty
+   setTime();
 }
 
 
-Buffer::Buffer(const TransferType& tt) 
- : type(tt), len(0), buf(0)
+Buffer::Buffer(const TransferType& tt, bool dyn) 
+ : type(tt), len(0), buf(0), dyn_(dyn)
 {
    setTime();
 }
@@ -17,7 +18,7 @@ Buffer::Buffer(const TransferType& tt)
 
 Buffer::~Buffer()
 {
-   if ( buf )
+   if ( dyn_ && buf )
       delete buf;
 }
 
