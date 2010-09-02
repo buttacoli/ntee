@@ -4,7 +4,7 @@
 #include <string>
 
 namespace ntee {
-   class Socket2;
+   class Socket;
    class BinaryDataFile;
 }
 
@@ -31,8 +31,8 @@ public:
 
 private:
 
-   int playback( ntee::Socket2*, ntee::BinaryDataFile& );
-   ntee::Socket2* connect();
+   int playback( ntee::Socket*, ntee::BinaryDataFile& );
+   ntee::Socket* connect();
    
    Config cfg_;
          

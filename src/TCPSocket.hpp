@@ -2,19 +2,20 @@
 #define INCLUDED_TCPSOCKED_HPP
 
 #include "IPAddress.hpp"
-#include "Socket2.hpp"
+#include "Socket.hpp"
 #include "Buffer.hpp"
 
 namespace ntee {
 
-class TCPSocket : public Socket2 {
+class TCPSocket : public Socket {
 public:
    
-   TCPSocket();
-   TCPSocket(int);
+   TCPSocket(const char*);
+   TCPSocket(const char*, int);
    
    int connectTo( Address& );
-   Socket2* listenOn( Address& );
+   int listenOn( Address& );
+   Socket* accept(const char* name);
    
    int send( const Buffer& );
    Buffer* recv();
@@ -22,8 +23,6 @@ public:
    bool good() const;
    int close();
    
-private:
-   int sockfd_;   
 };
 
 }   // end namespace ntee

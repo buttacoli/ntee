@@ -4,6 +4,8 @@
 #include "Settings.hpp"
 #include "UnixSignalHub.hpp"
 #include "comm.hpp"
+#include "TCPSocket.hpp"
+#include "IPAddress.hpp"
 #include <errno.h>
 #include <algorithm>
 #include <sys/select.h>
@@ -17,9 +19,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <cstdio>
+#include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
-
+#include <iostream>
 
 namespace ntee {
 
@@ -30,9 +33,9 @@ namespace ntee {
 //!
 //! @param s    The filled in Settings structure to work off of.
 //!
-NTee::NTee( const Settings& s ) : s_(s), Lsock_("L"), Rsock_("R") 
+NTee::NTee( const Settings& s ) : s_(s), Lsock_(0), Rsock_(0) 
 {
-   // empty
+   Lsock_ = new TCPSocket("L");
 }
 
 
@@ -57,7 +60,6 @@ void NTee::childExited( int sig )
    pid_t pid = wait(&status);
    
    int exitWith = WEXITSTATUS(status);
-   std::cout << "R client: " << pid << " has exited: " << exitWith << "\n";
    
    // We can't shutdown the Lsock_ socket, even though we know that the R
    // side won't be communicating anymore, because there still could be stuff
@@ -119,48 +121,15 @@ void NTee::startChildProc() {
 //! @returns the socket value upon which to eventually accept upon.
 //!          two more post-conditions of this routine are the setting of the
 //!          NTee instance's serverhost_ and srvPort_ members.
-int NTee::constructService( sockaddr_in* psa, socklen_t* plen )
+Socket* NTee::constructService( )
 {
-   int sock;
-   int type = (s_.protocol==Settings::TCP)? SOCK_STREAM : SOCK_DGRAM;   
-   SysErrIf( (sock=socket(AF_INET, type, 0 )) == -1 );
-
-   // Here we set the close-on-exec flag for the socket, because we don't want
-   // it to carry over to the client process.
-   SysErrIf( fcntl( sock, F_SETFD, FD_CLOEXEC ) == -1 );
-   
-   // Set up the internet address and port 
-   memset( psa, 0, *plen);
-   psa->sin_family = AF_INET;
-   psa->sin_addr.s_addr = htonl(INADDR_ANY);
-   psa->sin_port = htons(s_.srv_port);  // 0 is the wildcard port
-   SysErrIf( bind(sock, reinterpret_cast<sockaddr*>(psa),
-                  *plen) == -1);
-
-   // Get values for whatever the kernel decided to bind us to.
-   SysErrIf( getsockname(sock, reinterpret_cast<sockaddr*>(psa),
-                         plen) == -1 );
-
-   //** Save the server port that was assigned and the host address  
-   srvPort_ = ntohs(psa->sin_port);
-
-   char buf[NI_MAXHOST];
-   SysErrIf( gethostname( buf, sizeof(buf)) );
-   std::cout << "Server on: " << buf 
-             << ":" << ntohs(psa->sin_port) << "\n"; 
-   serverhost_.assign(buf);
-      
-   SysErrIf( inet_ntop(AF_INET, psa, buf, *plen) == 0 );
-   serverip_.assign(buf);
-   
-
-   
-   // magic # 5 is just what most examples use.
-   SysErrIf( listen(sock,5) == -1 );
-   
-   return sock;
+   Socket* svc = new TCPSocket("Service");
+   std::string sport = boost::lexical_cast<std::string>(s_.srv_port);
+   IPAddress ipaddr( "127.0.0.1", sport.c_str() );   
+   svc->listenOn(ipaddr);
+   return svc;
 }
-
+   
 
 
 //! @brief  Listens to both the L and R sockets.
@@ -172,33 +141,31 @@ void NTee::startListening()
 {
    int rc=0;
    fd_set rd_fds;
-   int max = std::max(Lsock_,Rsock_);
+   int max = std::max(Lsock_->getFD(),Rsock_->getFD());
 
    // force both L and R sockets to be non-blocking IO.
-   fcntl(Lsock_, F_SETFL, O_NONBLOCK);
-   fcntl(Rsock_, F_SETFL, O_NONBLOCK);
+   fcntl(Lsock_->getFD(), F_SETFL, O_NONBLOCK);
+   fcntl(Rsock_->getFD(), F_SETFL, O_NONBLOCK);
       
    FD_ZERO(&rd_fds);
-   FD_SET(Lsock_, &rd_fds);
-   FD_SET(Rsock_, &rd_fds);
+   FD_SET(Lsock_->getFD(), &rd_fds);
+   FD_SET(Rsock_->getFD(), &rd_fds);
    
    std::string msg;
-   std::cout << "Polling\n";
    char buf[1024];
    
    try_again:
    while( (rc=select(max+1, &rd_fds, 0, 0, 0)) > 0 ) {
-      std::cout << "Select returned: " << rc << "\n";
          
-      if ( FD_ISSET( Lsock_, &rd_fds ) )
-         transfer(Lsock_,Rsock_);
+      if ( FD_ISSET( Lsock_->getFD(), &rd_fds ) )
+         transfer(*Lsock_,*Rsock_);
          
-      if ( FD_ISSET( Rsock_, &rd_fds ) )
-         transfer(Rsock_,Lsock_);
+      if ( FD_ISSET( Rsock_->getFD(), &rd_fds ) )
+         transfer(*Rsock_,*Lsock_);
       
       FD_ZERO(&rd_fds);
-      FD_SET(Lsock_, &rd_fds);
-      FD_SET(Rsock_, &rd_fds);
+      FD_SET(Lsock_->getFD(), &rd_fds);
+      FD_SET(Rsock_->getFD(), &rd_fds);
       
    }
    if ( rc == -1 && errno == EINTR ) {
@@ -223,15 +190,13 @@ void NTee::startListening()
 void NTee::transfer( const Socket& from, const Socket& to )
 {
    char* buf = 0;
-   size_t len = read_n( from, &buf );
+   size_t len = read_n( from.getFD(), &buf );
    boost::shared_ptr<char> ptr( buf, free );
 
-   std::cout << "Reading from " << from << " --> " 
-             << to << " (" << len << ")\n";
    if ( len > 0 )
-      write_n( to, buf, len );
+      write_n( to.getFD(), buf, len );
    else
-      close(from);
+      close(from.getFD());
 
    alertRecorders(from, to, buf, len);
 }
@@ -280,49 +245,28 @@ void NTee::alertRecorders(const Socket& from, const Socket& to,
 int NTee::start()
 {
    //** Build up the service port.
-   sockaddr_in addr;
-   socklen_t len = sizeof(addr);
-   Socket sock;
-   sock = constructService( &addr, &len );
+   Socket* svc = constructService();
    
    //** Not going to accept yet! Instead, we start the client.
    startChildProc();
          
    // Back in the parent (ntee) otherwise we'd have exited.
-   SysErrIf( (Rsock_=accept(sock, reinterpret_cast<sockaddr*>(&addr),
-                             &len)) == -1 );
+   SysErrIf( (Rsock_=svc->accept("R")) == 0 );
+   svc->close();
+   delete svc;
       
    // Report the client connection.
-   char buf[INET_ADDRSTRLEN];
-   inet_ntop(AF_INET, &addr, buf, sizeof(addr));   
-   std::cout << "Client connection: " << buf
-             << ":" << ntohs(addr.sin_port) << "\n";
+//   char buf[INET_ADDRSTRLEN];
+//   inet_ntop(AF_INET, &addr, buf, sizeof(addr));   
+//   std::cout << "Client connection: " << buf
+//             << ":" << ntohs(addr.sin_port) << "\n";
    
    //** R process has connected... time to connect to the L process.
    int type = (s_.protocol==Settings::TCP)? SOCK_STREAM : SOCK_DGRAM;   
-   SysErrIf( (Lsock_=socket(AF_INET, type, 0 )) == -1 );
-
-   // Set up the internet address and port 
-   memset(&addr, 0, sizeof(addr));
-   struct addrinfo* pAddrInfo;
-   struct addrinfo hints;
-   memset(&hints, 0, sizeof(hints));
-   hints.ai_family = AF_INET;
-   hints.ai_socktype = SOCK_STREAM;
-    
-   int err = 0;
-   SysErrIf( (err=getaddrinfo(s_.L_host_ip.c_str(), s_.L_port.c_str(),
-                              &hints, &pAddrInfo)) != 0 )
-           .info("%s? %d:%s\n",s_.L_host_ip.c_str(),err,gai_strerror(err));
-           
-   SysErrIf( connect(Lsock_, pAddrInfo->ai_addr,
-                     pAddrInfo->ai_addrlen) == -1 );
-                       
+   IPAddress lip( s_.L_host_ip.c_str(), s_.L_port.c_str());
+   SysErrIf( Lsock_->connectTo(lip) == -1 );                       
    std::cout << "NTee connected to L side: " << s_.L_host_ip << ":"
              << s_.L_port << "\n";
-   
-   // free the address info structure alloced by getaddrinfo()
-   freeaddrinfo(pAddrInfo);
    
    //** Start listening to both sides and passing the information.
    startListening();

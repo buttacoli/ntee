@@ -17,7 +17,6 @@ NTEE_SOURCE := ntee_main.cpp \
                FileRecorder.cpp \
                Buffer.cpp \
                IPAddress.cpp \
-               Socket.cpp \
                TCPSocket.cpp \
                comm.cpp \
                BinaryDataFile.cpp \

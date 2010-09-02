@@ -10,7 +10,10 @@
 #include <arpa/inet.h>
 #include <boost/lexical_cast.hpp>
 #include "Error.hpp"
-#include "Socket.hpp"
+#include "TCPSocket.hpp"
+#include "IPAddress.hpp"
+using ntee::Socket;
+using ntee::TCPSocket;
 
 static int send( int sock, int nb )
 {
@@ -79,9 +82,9 @@ int main(int argc, char** argv)
 
    
    //** Connect to the server
-   Socket sock;
-   SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
-   SysErrIf( connect(sock, reinterpret_cast<sockaddr*>(&svAddr), sizeof(svAddr)) == -1 );
+   Socket* sock = new TCPSocket("Cli");
+   IPAddress ipaddr( svAddr );
+   SysErrIf( sock->connectTo(ipaddr) == -1 );
    
    //** Send maxPing messages to the server, each progressively longer then the last
    const int MAX_RETRY = 3;
@@ -92,8 +95,8 @@ int main(int argc, char** argv)
       int rnb=0;
       int resend = 0;
       do {
-         SysErrIf( (snb = send( sock, 1<<pingCnt )) == -1 );
-         SysErrIf( (rnb = recv( sock )) == -1 );
+         SysErrIf( (snb = send( sock->getFD(), 1<<pingCnt )) == -1 );
+         SysErrIf( (rnb = recv( sock->getFD() )) == -1 );
       } while( resend++ < MAX_RETRY && rnb != snb );
       ErrIf( resend == MAX_RETRY )
          .info("Unable to checksum last packet, %d sent != %d recv\n",snb,rnb);

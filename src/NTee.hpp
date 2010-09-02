@@ -56,7 +56,7 @@ protected:
 private:
    
    void startChildProc();
-   int constructService( sockaddr_in*, socklen_t* );
+   Socket* constructService();
    void startListening();
    void transfer(const Socket&, const Socket& );
    void alertRecorders( const Socket&, const Socket&, 
@@ -69,8 +69,8 @@ private:
    std::string serverhost_;
    std::string serverip_;
    unsigned int srvPort_;
-   Socket Lsock_;
-   Socket Rsock_;
+   Socket* Lsock_;
+   Socket* Rsock_;
 };
 
 } // end namespace ntee

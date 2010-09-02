@@ -24,8 +24,25 @@ bool BinaryDataFile::good() const
 //!           are no more buffers of type tt.
 Buffer* BinaryDataFile::getNext( const TransferType& tt )
 {
-   return 0;
+   Buffer* pB = 0;
+   while ( (pB=readNext()) != 0 && pB->type != tt ) {
+      delete pB;  // throw buffers of wrong type away!
+   }
+   return pB;
 }
+
+
+//! @returns a dynamically allocated and filled buffer, unless the 
+//!          end of file is reached, then NULL will be returned.
+Buffer* BinaryDataFile::readNext()
+{
+   Buffer* pB = 0;
+   if ( good() ) {
+      pB = new Buffer();
+   }
+   return pB;
+}
+
 
 
 //! @returns  true if the stream has reached the eof.  false if not.

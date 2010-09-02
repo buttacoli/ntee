@@ -4,17 +4,17 @@
 
 namespace ntee {
 
-TCPSocket::TCPSocket()
- : sockfd_(0)
+TCPSocket::TCPSocket(const char* ccp)
+ : Socket(ccp)
 {
    sockfd_ = socket( AF_INET, SOCK_STREAM, 0 );
 }
 
 
-TCPSocket::TCPSocket( int fd )
- : sockfd_(fd)
+TCPSocket::TCPSocket(const char* ccp, int fd )
+ : Socket(ccp)
 {
-   // empty
+   sockfd_ = fd;
 }
 
 
@@ -24,24 +24,28 @@ int TCPSocket::connectTo( Address& addr )
 }
 
 
-Socket2* TCPSocket::listenOn( Address& addr )
+int TCPSocket::listenOn( Address& addr )
 {
    int err = 0;
    SysErrIf( (err=bind(sockfd_, addr.getAddr(), addr.getLen() )) == -1 );   
    SysErrIf( (err=listen(sockfd_, 5)) == -1 );
-   
+   return err;
+}
+
+Socket* TCPSocket::accept(const char* name) {
+   int err = 0;
    sockaddr_in saddr;
    socklen_t len = sizeof(saddr);
-   SysErrIf( (err=accept(sockfd_, (sockaddr*) &saddr, &len )) == -1 );
+   SysErrIf( (err=::accept(sockfd_, (sockaddr*) &saddr, &len )) == -1 );
       
    // make an Address out of client
-   return new TCPSocket( err );
+   return new TCPSocket( name, err );
 }
 
 
 int TCPSocket::send( const Buffer& buf )
 {
-   return 0;
+   return ::send(sockfd_, buf.buf, buf.len, 0);
 }
 
 ntee::Buffer* TCPSocket::recv()

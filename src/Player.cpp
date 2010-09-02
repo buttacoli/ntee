@@ -37,9 +37,9 @@ int Player::start()
    SysErrIf( data.open(cfg_.file) != 0 );
    
    // Connect with the client (or server);
-   Socket2 *pS;
+   Socket *pS;
    ErrIf( (pS=connect()) == 0 );
-   boost::scoped_ptr<Socket2> sock(pS);
+   boost::scoped_ptr<Socket> sock(pS);
    
    // Playback the data into the socket
    playback( pS, data );
@@ -57,17 +57,19 @@ int Player::start()
 //!
 //! @returns  Established socket connection
 //!
-Socket2* Player::connect()
+Socket* Player::connect()
 {
-   Socket2 *sock = new TCPSocket();
+   Socket *sock = new TCPSocket("Player");
    IPAddress ip( cfg_.host.c_str(), cfg_.port.c_str() );
 
    if ( cfg_.type == Config::CLIENT ) {
       sock->connectTo(ip);
    }
    else {
-      Socket2* client = sock->listenOn(ip);
+      sock->listenOn(ip);
+      Socket* client = sock->accept("Cli");
       sock->close();
+      delete sock;
       return client;
    }
    return sock;
@@ -82,7 +84,7 @@ Socket2* Player::connect()
 //! @return 0 if there were no error sending the data. -1 if something 
 //!         bad happened.
 //!
-int Player::playback( Socket2* pS, BinaryDataFile& data )
+int Player::playback( Socket* pS, BinaryDataFile& data )
 {
    TransferType buf_T = (cfg_.type == Config::CLIENT)?R_to_L:L_to_R;
    while ( pS->good() && data.good() && ! data.eof() ) {

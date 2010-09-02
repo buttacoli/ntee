@@ -4,7 +4,7 @@
 #include <string>
 #include <cstring>
 
-//! @mainpage  Player
+//! @brief  Player
 //!
 //! Read an input data file and play-back the contents.
 //!
