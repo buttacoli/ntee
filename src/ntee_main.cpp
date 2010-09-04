@@ -32,11 +32,12 @@
 #include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include "NTee.hpp"
 #include "Arguments.hpp"
 #include "Settings.hpp"
 #include "Builder.hpp"
 #include "FileRecorder.hpp"
-#include "NTee.hpp"
+#include "BinaryDataRecorder.hpp"
 
 int main(int argc, char** argv)
 {
@@ -94,6 +95,13 @@ int main(int argc, char** argv)
    //** Based on the settings, build the right NTee type and add the FileRecorder
    boost::scoped_ptr<NTee> pNT( Builder::build( s ) );
    pNT->addRecorder( boost::shared_ptr<Recorder>(new FileRecorder(s) ));
+   
+   //** Binary data file uses the same name as FileRecorder, but with a .bdr extension.
+   std::string sBDRfn = s.output_filename + ".bdr";
+   BinaryDataRecorder* pBDR = new BinaryDataRecorder();
+   pBDR->open( sBDRfn.c_str() ); 
+   pNT->addRecorder( boost::shared_ptr<Recorder>(pBDR));
+   
    return pNT->start();
 }
    

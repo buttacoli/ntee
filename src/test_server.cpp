@@ -11,7 +11,10 @@
 #include <errno.h>
 #include <boost/lexical_cast.hpp>
 #include "Error.hpp"
-#include "Socket.hpp"
+#include "TCPSocket.hpp"
+#include "IPAddress.hpp"
+#include "Buffer.hpp"
+using namespace ntee;
 
 static void handleClient(Socket&);
 
@@ -29,38 +32,22 @@ int main(int argc, char** argv)
    ErrIfCatch(boost::bad_lexical_cast,
               port = boost::lexical_cast<in_port_t>( argv[1] ))
              .info("%s is not a port number!\n",argv[1]);
-   
-   // Put the supplied ip addr into the sockaddr_in struct, we will reuse this
-   // memory later to store client addresses in it as they connect.
-   sockaddr_in addr;
-   memset( &addr, 0, sizeof(addr) );
-   addr.sin_family = AF_INET;
-   addr.sin_addr.s_addr = htonl(INADDR_ANY);  // Wildcard address kernel picks best bind     
-   addr.sin_port = htons(port);
       
-   
    //** Get the server to accept stage
-   Socket sock;
-   SysErrIf( (sock=socket(AF_INET, SOCK_STREAM, 0)) == -1 );
-   SysErrIf( bind(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1 );
-   SysErrIf( listen(sock, 5) == -1 );
+   IPAddress ip("localhost", port);
+   Socket* sock = new TCPSocket("Svc");
+   sock->listenOn(ip);
+
    
    //** Forever accept new connections and reply
    for( ;; ) {
-     Socket cliSock;
-     memset( &addr, 0, sizeof(addr) );
-     socklen_t len = sizeof(addr);
-     SysErrIf( (cliSock=accept(sock,reinterpret_cast<sockaddr*>(&addr),&len)) == -1 );
-     
-     char cliName[INET_ADDRSTRLEN];
-     WarnIf( inet_ntop(AF_INET, &addr, cliName, sizeof(cliName) ) == 0 );
-     std::cout << "CONNECTED to: " << ((cliName)?cliName:"Unknown") 
-               << ":" << addr.sin_port << "\n";
-     
-     handleClient( cliSock );
-  
+     Socket* cliSock = sock->accept("Client");
+     std::cout << "Connection made: fd = " << cliSock->getFD() << "\n";     
+     handleClient( *cliSock );
+     delete cliSock;
    }
    
+   delete sock;
    return 0;
 }
 
@@ -73,22 +60,20 @@ int main(int argc, char** argv)
 //!
 void handleClient( Socket& cliSock ) {
 
-   size_t rnb, total;
-   static char buf[1020];  // Hack! This is not 1024, just so when the client sends
-                           // that number of bytes, the recv call below won't block
-                           // and screw things up.
+   Buffer* pB;
+   size_t total;
 
-   while( 1 ) {
-      total = 0;
-      while ( (rnb=recv(cliSock,buf,sizeof(buf),0)) == 1020 ) {
-         total += rnb;
-      }
-      total += rnb;
-      if ( total == 0 ) return;
+   while( (pB=cliSock.recv()) != 0 ) {
+      total = pB->len;
+      delete pB;
       
       std::cout << "    RECIEVED " << total << " bytes\n"; 
 
       size_t snb = htonl(total);
-      WarnIf( (snb=send(cliSock, &snb, sizeof(snb), 0)) == -1 );
-   } 
+      Buffer b(false);    // NOT dynamic memory.
+      b.buf = (const char*) &snb;
+      b.len = sizeof(snb);
+      WarnIf( (snb=cliSock.send(b)) < b.len );
+   }
+   std::cout << "Client DISCONNECTED\n"; 
 }

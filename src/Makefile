@@ -7,6 +7,7 @@ DOXYGEN := doxygen
 MKDIR := mkdir -p
 
 CXXFLAGS := -ggdb
+LDLIBS := -lrt
 
 NTEE_SOURCE := ntee_main.cpp \
                Arguments.cpp \
@@ -14,17 +15,26 @@ NTEE_SOURCE := ntee_main.cpp \
                Error.cpp \
                NTee.cpp \
                FileRecorder.cpp \
-               Socket.cpp \
+               Buffer.cpp \
+               IPAddress.cpp \
+               TCPSocket.cpp \
                comm.cpp \
+               BinaryDataRecorder.cpp \
                UnixSignalHub.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
 NTEE_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(NTEE_SOURCE)))
                
-               
+
+PLAYER_SRC := player_main.cpp \
+              BinaryDataReader.cpp \
+              Player.cpp
+PLAYER_OBJ := $(subst .cpp,.o,$(PLAYER_SRC))
+PLAYER_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(PLAYER_SRC)))
+              
                
 .PHONY: all code doxy clean
-code: $(BIN)/ntee $(BIN)/testCli $(BIN)/testSrv
+code: $(BIN)/ntee $(BIN)/testCli $(BIN)/testSrv $(BIN)/ntee_player
 all: code doxy
 doxy: $(DOXYDIR)/index.html
 
@@ -39,7 +49,7 @@ $(LIB)/ntee.a: $(NTEE_OBJ)
 
 $(BIN)/ntee: $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ -lrt
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 $(BIN)/testCli: test_client.cpp $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
@@ -49,16 +59,20 @@ $(BIN)/testSrv: test_server.cpp $(LIB)/ntee.a
 	-$(MKDIR) $(BIN)
 	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
+$(BIN)/ntee_player: $(PLAYER_OBJ) $(LIB)/ntee.a
+	-$(MKDIR) $(BIN)
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@ 
 
 clean:
 	-rm $(NTEE_OBJ) $(NTEE_DEPS) $(LIB)/ntee.a $(BIN)/{ntee,testCli,testSrv}
+	-rm $(PLAYER_OBJ) $(PLAYER_DEPS) $(BIN)/ntee_player
 
 
 
 ## Include all the .d files (fails the first time, but that's ok, make
 ## just keeps on processing)... These are formatted to LOOK like dependency
 ## targets specific to each cpp file.
-include $(NTEE_DEPS) 
+include $(NTEE_DEPS) $(PLAYER_DEPS)
 
 
 ## This is the rule for generating a .d from a .cpp.  It utilizes the fact

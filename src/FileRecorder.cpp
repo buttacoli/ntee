@@ -57,7 +57,6 @@ void FileRecorder::body( const char* buf, size_t len )
    using std::setw;
    using std::setfill;
    
-   // TODO: convert to hex
    const unsigned char* p = (const unsigned char*) buf;
    size_t at = 0;
    while( at < len ) {
