@@ -19,7 +19,7 @@ NTEE_SOURCE := ntee_main.cpp \
                IPAddress.cpp \
                TCPSocket.cpp \
                comm.cpp \
-               BinaryDataFile.cpp \
+               BinaryDataRecorder.cpp \
                UnixSignalHub.cpp
                
 NTEE_OBJ := $(subst .cpp,.o,$(NTEE_SOURCE))               
@@ -27,6 +27,7 @@ NTEE_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(NTEE_SOURCE)))
                
 
 PLAYER_SRC := player_main.cpp \
+              BinaryDataReader.cpp \
               Player.cpp
 PLAYER_OBJ := $(subst .cpp,.o,$(PLAYER_SRC))
 PLAYER_DEPS := $(patsubst %,.%,$(subst .cpp,.d,$(PLAYER_SRC)))

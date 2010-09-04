@@ -5,7 +5,7 @@
 
 namespace ntee {
    class Socket;
-   class BinaryDataFile;
+   class BinaryDataReader;
 }
 
 //! The Player class reads ntee output files and pushes data out
@@ -31,7 +31,7 @@ public:
 
 private:
 
-   int playback( ntee::Socket*, ntee::BinaryDataFile& );
+   int playback( ntee::Socket*, ntee::BinaryDataReader& );
    ntee::Socket* connect();
    
    Config cfg_;

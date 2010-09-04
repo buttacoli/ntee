@@ -1,10 +1,12 @@
 #include "Player.hpp"
 #include "TCPSocket.hpp"
-#include "BinaryDataFile.hpp"
+#include "BinaryDataReader.hpp"
 #include "Error.hpp"
 #include "IPAddress.hpp"
+#include <iostream>
 #include <boost/scoped_ptr.hpp>
 using namespace ntee;
+
 
 //! @brief Player Constructor
 //!
@@ -33,7 +35,7 @@ Player::Player( const Config& cfg )
 int Player::start()
 {
    // Open the file
-   BinaryDataFile data;
+   BinaryDataReader data;
    SysErrIf( data.open(cfg_.file) != 0 );
    
    // Connect with the client (or server);
@@ -80,17 +82,30 @@ Socket* Player::connect()
 //!
 //! Reads data from the data file, and sends it over the connected socket.
 //! The method will return -1 if there is any problems sending the data.
-//!
+//! @param pS    pointer to Socket upon which to play data
+//! @param data  Reference to the data source (the Reader) itself.
 //! @return 0 if there were no error sending the data. -1 if something 
 //!         bad happened.
 //!
-int Player::playback( Socket* pS, BinaryDataFile& data )
+int Player::playback( Socket* pS, BinaryDataReader& data )
 {
    TransferType buf_T = (cfg_.type == Config::CLIENT)?R_to_L:L_to_R;
    while ( pS->good() && data.good() && ! data.eof() ) {
       Buffer* pB;
-      if ((pB = data.getNext( buf_T )) != 0 ) {
-         pS->send( *pB );
+      if ((pB = data.getNext()) != 0 ) {
+         if ( pB->type == buf_T ) {
+            // Got a buffer we're supposed to send...
+            pS->send( *pB );
+         }
+         else {
+            // Got a buffer we're supposed to recieve! See what we get?
+            Buffer* pBGot = pS->recv();
+            if ( pBGot->len != pB->len ) {
+               std::cerr << "Recieved a message of unmatching length: got=" << pBGot->len
+                         << " bytes, expected=" << pB->len << " bytes.\n";
+            }
+            delete pBGot;
+         }  
          delete pB;
       }
    }

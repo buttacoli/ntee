@@ -48,10 +48,16 @@ Socket* TCPSocket::accept(const char* name) {
 }
 
 
+//! @brief Send a payload of a Buffer
+//! 
+//! @param buf  Buffer reference to send data from.
+//! @returns the number of bytes sent, -1 with errno set if there was a
+//!          problem.
 int TCPSocket::send( const Buffer& buf )
 {
    return ::send(sockfd_, buf.buf, buf.len, 0);
 }
+
 
 //! @returns Address of a dynamically allocated Buffer filled with 
 //!          dynamically allocated char* content OR NULL if zero
