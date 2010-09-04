@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$class_socket.html" title="Socket" alt="" coords="5,7,72,33"/>
-<area shape="rect" href="$structntee_1_1_settings.html" title="Structure to hold ntee configuration." alt="" coords="96,7,216,33"/>
+<area shape="rect" href="$structntee_1_1_settings.html" title="Structure to hold ntee configuration." alt="" coords="5,7,125,33"/>
+<area shape="rect" href="$classntee_1_1_socket.html" title="ntee::Socket" alt="" coords="149,7,261,33"/>
 </map>

@@ -1,3 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$class_error_handler.html" title="A solid error handling system makes everything easier." alt="" coords="5,5,109,32"/>
+<area shape="rect" href="$class_address.html" title="Address" alt="" coords="5,5,80,32"/>
+<area shape="rect" href="$class_i_p_address.html" title="IPAddress" alt="" coords="129,5,215,32"/>
 </map>

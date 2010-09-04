@@ -6,7 +6,7 @@ bin/*
 lib/
 
 ## Ignore the whole doxy directory and anything in it
-doxy/
+##doxy/
 
 ## Do not track any .o, .a, or .so files
 *.o
