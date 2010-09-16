@@ -18,7 +18,9 @@ public:
    sockaddr* getAddr();
    int getLen();
    int getPort();
-   
+   std::string getHostname();
+   std::string getIPAddress();
+      
    IPAddress* clone() const;
    
 private:

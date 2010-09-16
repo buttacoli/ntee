@@ -59,6 +59,12 @@ Settings Arguments::parse( int argc, char** argv )
          std::cerr << usage_ << "\n";
          std::exit(0);
       }
+      else if ( ! strcmp(argv[i],"--hex-only") ) {
+         s.hex_only = true;
+      }
+      else if ( ! strcmp(argv[i],"--binary-only") ) {
+         s.binary_only = true;
+      }
       else if ( ! strcmp(argv[i],"-o") && i+1 <= last_arg_index ) {
          s.output_filename.assign(argv[++i]);
       }
@@ -70,6 +76,9 @@ Settings Arguments::parse( int argc, char** argv )
          ErrIfCatch(boost::bad_lexical_cast,
                     s.srv_port=boost::lexical_cast<unsigned short>(argv[++i]))
                   .info("Bad port number specification\n");
+      }
+      else if ( ! strcmp(argv[i],"-H") && i+1 <= last_arg_index ) {
+         s.srv_host.assign(argv[++i]);
       }
       else if ( ! strcmp(argv[i],"-L") && i+2 <= last_arg_index ) {
          s.L_host_ip.assign(argv[++i]);

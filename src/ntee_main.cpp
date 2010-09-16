@@ -43,7 +43,8 @@ int main(int argc, char** argv)
 {
    //! The @NTEEPORT string when seen in the arguments will be expanded to whatever
    //! port the kernel selected for the ntee server.
-   std::string USAGE("Usage: ntee [-h|--help] [-o <path>] [--sock <tcp|udp>] [-p <N>]\n"
+   std::string USAGE("Usage: ntee [-h|--help] [-o <path>] [--sock <tcp|udp>] [-p <N>] [-H <host>]\n"
+                     "             --binary-only --hex-only\n"
                      "             -L <host> <port> -R <cmd> [@NTEEPORT] [args...]\n");
    std::string HELP( "Purpose: NTEE is a program which sits between two other programs communicating\n"
                      "         through sockets.  As traffic comes between programs L and R, ntee\n"
@@ -58,28 +59,35 @@ int main(int argc, char** argv)
                      "\n"
                      "Flags:\n"
                      "  -o <path>         Path to where the output should be written.\n" 
-                     "                    Defaults to ./ntee_output\n"
+                     "                     Defaults to ./ntee_output\n"
                      "  --sock <tcp|udp>  Defines the socket type which the L and R side processes\n"
-                     "                    are using.  Defaults to tcp.\n"
+                     "                     are using.  Defaults to tcp.\n"
                      "  -p <int>          Forces the port number upon which ntee will serve to the\n"
-                     "                    R side process.  This is here in case the R program has\n"
-                     "                    its connection hardcoded to use a certain port.\n"
+                     "                     R side process.  This is here in case the R program has\n"
+                     "                     its connection hardcoded to use a certain port.\n"
+                     "  -H <host|ip>      Name or IP address to use when building up the ntee service\n"
+                     "                     which the R side will connect to.\n"
+                     "  --binary-only     Only write a binary recording file to the current directory\n"
+                     "                     unless the -o option is used.  The file will be appended\n"
+                     "                     with a .bdr extension.\n"
+                     "  --hex-only        Only write a hex dump recording of the transmissions between\n"
+                     "                     L and R side.\n"
                      "  -L <ip> <int>     The ip address and port number of the L side process.\n"
-                     "                    ntee will connect to this process after the R side program\n"
-                     "                    has been started and decides to connect with ntees service\n"
-                     "                    port.\n"
+                     "                     ntee will connect to this process after the R side program\n"
+                     "                     has been started and decides to connect with ntees service\n"
+                     "                     port.\n"
                      "  -R <cmd> [args]   The user specifies the R side process by giving its\n"
-                     "                    command line argument, the special argument @NTEEPORT,\n"
-                     "                    @NTEESERVERHOSTNAME, or @NTEESERVERHOSTADDR can be inserted\n"
-                     "                    anywhere in the args and be replaced to the port number,\n"
-                     "                    human readable hostname, or ip address of the host for which\n"
-                     "                    the process would connect with ntee upon.\n"
-                     "                    NOTE: Because the argument parsing fills the array holding\n"
-                     "                          the command specified with any and all remaining args,\n"
-                     "                          the -R specification MUST BE THE LAST thing on the\n"
-                     "                          command line!  Other options the follow -R will be\n"
-                     "                          used in the starting of the R side client and not as\n"
-                     "                          settings for ntee.\n"
+                     "                     command line argument, the special argument @NTEEPORT,\n"
+                     "                     @NTEESERVERHOSTNAME, or @NTEESERVERHOSTADDR can be inserted\n"
+                     "                     anywhere in the args and be replaced to the port number,\n"
+                     "                     human readable hostname, or ip address of the host for which\n"
+                     "                     the process would connect with ntee upon.\n"
+                     "                     NOTE: Because the argument parsing fills the array holding\n"
+                     "                           the command specified with any and all remaining args,\n"
+                     "                           the -R specification MUST BE THE LAST thing on the\n"
+                     "                           command line!  Other options the follow -R will be\n"
+                     "                           used in the starting of the R side client and not as\n"
+                     "                           settings for ntee.\n"
                      "\n"
                      "Notes:\n"
                      "  - Both the -L and -R arguments must be specified for ntee to start properly.\n"
@@ -94,13 +102,19 @@ int main(int argc, char** argv)
    
    //** Based on the settings, build the right NTee type and add the FileRecorder
    boost::scoped_ptr<NTee> pNT( Builder::build( s ) );
-   pNT->addRecorder( boost::shared_ptr<Recorder>(new FileRecorder(s) ));
    
-   //** Binary data file uses the same name as FileRecorder, but with a .bdr extension.
-   std::string sBDRfn = s.output_filename + ".bdr";
-   BinaryDataRecorder* pBDR = new BinaryDataRecorder();
-   pBDR->open( sBDRfn.c_str() ); 
-   pNT->addRecorder( boost::shared_ptr<Recorder>(pBDR));
+   if ( s.hex_only == false ) {
+      //** make the Hex recording
+      pNT->addRecorder( boost::shared_ptr<Recorder>(new FileRecorder(s) ));
+   }
+   
+   if ( s.binary_only == false ) {
+      //** Binary data file uses the same name as FileRecorder, but with a .bdr extension.
+      std::string sBDRfn = s.output_filename + ".bdr";
+      BinaryDataRecorder* pBDR = new BinaryDataRecorder();
+      pBDR->open( sBDRfn.c_str() ); 
+      pNT->addRecorder( boost::shared_ptr<Recorder>(pBDR));
+   }
    
    return pNT->start();
 }

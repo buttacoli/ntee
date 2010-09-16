@@ -15,7 +15,6 @@ IPAddress::IPAddress(const char* host, const char* port)
    compute();
 }
 
-#include <iostream>
 IPAddress::IPAddress(const char* host, int port )
  : pAI_(0), hostname_(host)
 {
@@ -31,6 +30,24 @@ IPAddress::~IPAddress()
    freemem();
 }
 
+
+//! Return an IP address representation of the hostname
+std::string IPAddress::getIPAddress() {
+   char ip[INET6_ADDRSTRLEN];
+   if ( pAI_ ) {
+      inet_ntop(pAI_->ai_family, 
+                pAI_->ai_addr, ip,
+                pAI_->ai_addrlen );
+   }
+   return std::string(ip);
+}
+
+//! Return the hostname itself in human form.
+std::string IPAddress::getHostname() {
+   return hostname_;
+}
+
+//! Frees the memory in the addrinfo structure.
 void IPAddress::freemem()
 {
    if ( pAI_ )

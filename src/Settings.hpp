@@ -27,11 +27,13 @@ struct Settings {
    
    proto protocol;                     //!< protocol to use when connecting
    unsigned short srv_port;            //!< port to start on (0 means wildcard!)
+   std::string srv_host;               //!< hostname to use when setting up service
    std::string output_filename;        //!< output file path name
    std::string L_host_ip;              //!< IP address of the L program
    std::string L_port;                 //!< Port at which L is listening
    char** R_cmd;                       //!< Command line args to start R with
-
+   bool hex_only;
+   bool binary_only;
    
    //! @brief Initializes a default Settings structure.
    //!
@@ -39,9 +41,12 @@ struct Settings {
    //! the ntee program.
    Settings() : protocol(TCP), 
                 srv_port(WILDCARD_PORT),
+                srv_host("localhost"),
                 output_filename(DEFAULT_OUTPUT),
                 L_host_ip(""),
-                L_port("")
+                L_port(""),
+                hex_only(false),
+                binary_only(false)
    {  /* empty */ }
 };
 
